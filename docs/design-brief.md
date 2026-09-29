@@ -4,6 +4,7 @@ Visual direction for the Steady IBS app, drawn from polarity.so, cohere.com, and
 Values marked "measured" come from computed styles on the live sites, captured 2026-09-28.
 ada.cx blocked automated capture, so its values are "sampled" from pixel colors in screenshots, and its type details are inferred by eye.
 The working reference page is `design/steady-design.html` (published at https://claude.ai/artifact/7R3iBaY7ADAs197F2vjYMC), and `design/flow.test.mjs` runs its end-to-end checks.
+The planned stack and data flow (React, Hono, Drizzle and Postgres, Better-Auth) are drawn in `design/steady-stack.html` (published at https://claude.ai/artifact/V4gpi9H8L4BQtk1LgXwJcU).
 
 ## 1. The one-line direction
 
