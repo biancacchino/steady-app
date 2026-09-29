@@ -1,0 +1,867 @@
+<title>Steady Visual Language</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400&family=Hanken+Grotesk:wght@400;500&display=swap">
+<style>
+/* Layout: single left-aligned column, wide margins, sections separated by space and hairlines. The page uses Steady's own tokens. */
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-warm: #f0eee9;
+  --ink: #212121;
+  --muted: #6b6b80;
+  --line: #e4e2dc;
+  --primary: #39594d;
+  --on-primary: #ffffff;
+  --primary-soft: #e3ebe7;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.13 0 0 0 0 0.13 0 0 0 0 0.13 0.06 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+  --paper: #ffffff; --paper-ink: #212121; --paper-muted: #6b6b80; --paper-line: #e4e2dc;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --r-card: 8px; --r-sheet: 16px; --r-pill: 9999px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16242a; --surface: #1c2d34; --surface-warm: #1f3036; --ink: #fafafa; --muted: #97a3a6;
+    --line: rgb(255 255 255 / 0.12); --primary: #8fbe8e; --on-primary: #16242a; --primary-soft: #233a31;
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.07 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #16242a; --surface: #1c2d34; --surface-warm: #1f3036; --ink: #fafafa; --muted: #97a3a6;
+  --line: rgb(255 255 255 / 0.12); --primary: #8fbe8e; --on-primary: #16242a; --primary-soft: #233a31;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.07 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--grain) 0 0 / 180px 180px, var(--bg); color: var(--ink); font: 400 16px/1.6 var(--sans); padding: 0 16px; }
+main { max-width: 960px; margin: 0 auto; padding-block: 48px 96px; display: grid; gap: 72px; }
+h1, h2, h3, p { margin: 0; }
+h1 { font: 400 clamp(40px, 7vw, 56px)/1.0 var(--display); letter-spacing: -0.03em; text-wrap: balance; }
+h2 { font: 500 24px/1.25 var(--sans); letter-spacing: -0.01em; text-wrap: balance; }
+h3 { font: 500 16px/1.4 var(--sans); }
+.label { font: 500 12px/1.4 var(--sans); letter-spacing: .02em; color: var(--muted); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; line-height: 1.5; }
+.num { font-variant-numeric: tabular-nums; }
+section { display: grid; gap: 24px; border-top: 1px solid var(--line); padding-top: 40px; min-width: 0; }
+.intro { display: grid; gap: 16px; }
+.intro h1 { max-width: 20ch; }
+.topbar { display: flex; justify-content: flex-end; }
+.lede { font-size: 18px; color: var(--muted); max-width: 60ch; }
+
+/* theme switch */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px; gap: 2px; background: var(--surface); }
+.seg button { font: 500 13px var(--sans); border: 0; background: transparent; color: var(--muted); padding: 6px 14px; border-radius: var(--r-pill); cursor: pointer; transition: background-color 150ms var(--ease), color 150ms var(--ease); }
+.seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+
+/* focus */
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* grids */
+.grid { display: grid; gap: 16px; }
+.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); }
+.three { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+
+/* swatches */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.sw { border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; background: var(--surface); }
+.sw .chip { height: 72px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-end; padding: 8px 12px; font: 500 13px var(--sans); }
+.sw .meta { padding: 10px 12px; display: grid; gap: 2px; }
+.sw code { font: 13px ui-monospace, Menlo, monospace; }
+.palette-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; }
+
+/* type */
+.spec { display: grid; grid-template-columns: 150px 1fr; gap: 8px 24px; align-items: baseline; padding-block: 16px; border-bottom: 1px solid var(--line); }
+.spec:last-child { border-bottom: 0; }
+.spec > div { min-width: 0; }
+@media (max-width: 560px) { .spec { grid-template-columns: 1fr; } }
+.t-display { font: 400 48px/1.0 var(--display); letter-spacing: -0.03em; }
+.t-heading { font: 500 24px/1.25 var(--sans); letter-spacing: -0.01em; }
+.t-body { font: 400 16px/1.6 var(--sans); max-width: 62ch; }
+.t-small { font: 400 14px/1.5 var(--sans); }
+.t-label { font: 500 12px/1.4 var(--sans); letter-spacing: .02em; }
+
+/* buttons, tags, inputs */
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn { font: 500 15px/1 var(--sans); border-radius: var(--r-pill); padding: 12px 20px; border: 1px solid transparent; cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease), transform 150ms var(--ease); }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--primary); color: var(--on-primary); }
+.btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--primary) 88%, var(--ink)); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:disabled:active { transform: none; }
+.btn-sm { padding: 9px 16px; font-size: 14px; }
+.btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn-secondary:hover { border-color: var(--muted); }
+.btn-quiet { background: transparent; color: var(--primary); padding-inline: 8px; }
+.tag { font: 500 12px/1 var(--sans); letter-spacing: .02em; padding: 6px 10px; border-radius: var(--r-pill); border: 1px solid var(--line); color: var(--muted); background: var(--surface); }
+.tag.on { border-color: var(--primary); background: var(--primary-soft); color: var(--ink); }
+.field { display: grid; gap: 6px; }
+.field label { font: 500 14px var(--sans); }
+.field textarea { font: 400 16px/1.5 var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 12px; resize: vertical; min-height: 84px; transition: border-color 150ms var(--ease); }
+.field textarea:hover { border-color: var(--muted); }
+.field .hint { font-size: 13px; color: var(--muted); }
+
+/* flags and examples */
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.flag-btn { display: inline-flex; gap: 6px; align-items: center; align-self: start; font: 500 13px/1 var(--sans); color: var(--muted); background: transparent; border: 1px solid var(--line); padding: 7px 12px; border-radius: var(--r-pill); cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease); }
+.flag-btn svg { width: 14px; height: 14px; flex: none; }
+.flag-btn:hover { border-color: var(--muted); color: var(--ink); }
+.flag-btn[aria-pressed="true"] { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+.flag-btn[aria-pressed="true"] svg path { fill: currentColor; }
+.example { font: 400 13px var(--sans); color: var(--muted); }
+
+/* screener */
+.screen { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sheet); padding: 28px; display: grid; gap: 20px; }
+.screen .q { font: 400 28px/1.15 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.choices { display: grid; gap: 8px; }
+.choice { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1px solid var(--line); border-radius: var(--r-pill); cursor: pointer; font-size: 16px; transition: border-color 150ms var(--ease), background-color 150ms var(--ease); }
+.choice:hover { border-color: var(--muted); }
+.choice input { accent-color: var(--primary); width: 18px; height: 18px; margin: 0; }
+.choice:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+.result { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sheet); padding: 28px; display: grid; gap: 16px; align-content: start; }
+.result .say { font: 400 28px/1.15 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+
+/* journal: week strip + day-grouped entries (React Aria ToggleButtonGroup + GridList) */
+.journal { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sheet); overflow: clip; }
+.journal-head { display: flex; align-items: center; gap: 12px; padding: 20px 24px 0; }
+.journal-head h3 { font: 400 28px/1.1 var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.icon-btn { display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); }
+.icon-btn svg { width: 16px; height: 16px; }
+.icon-btn:hover:not(:disabled) { border-color: var(--muted); background: var(--primary-soft); }
+.icon-btn:disabled { color: var(--muted); opacity: .45; cursor: not-allowed; }
+.journal-obs { padding: 6px 24px 0; }
+.week { list-style: none; margin: 0; padding: 14px 12px 18px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+.wd { all: unset; box-sizing: border-box; width: 100%; display: grid; justify-items: center; gap: 6px; padding: 6px 0; cursor: pointer; border-radius: var(--r-card); }
+.wd:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.wd-d { font: 500 13px/1 var(--sans); color: var(--muted); }
+.wd-n { font: 400 20px/1 var(--display); font-variant-numeric: tabular-nums; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; transition: background-color 150ms var(--ease), color 150ms var(--ease); }
+.wd:hover .wd-n { background: var(--primary-soft); }
+.wd[aria-pressed="true"] .wd-n { background: var(--primary); color: var(--on-primary); }
+.wd-m { position: relative; width: 100%; height: 12px; display: grid; place-items: center; }
+.wd-m::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--line); }
+.week li:first-child .wd-m::before { left: 50%; }
+.week li:last-child .wd-m::before { right: 50%; }
+.wd-m i { position: relative; width: 9px; height: 9px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--muted); }
+.wd-m i.on { background: var(--primary); border-color: var(--primary); }
+.wd-w { font-size: 11px; line-height: 1.2; color: var(--muted); min-height: 1.2em; }
+.day-group { display: grid; grid-template-columns: 80px minmax(0, 1fr); }
+.day-group + .day-group { border-top: 1px solid var(--line); }
+.day-date { position: sticky; top: 16px; align-self: start; display: grid; gap: 2px; padding: 18px 0 18px 24px; }
+.dd-w { font: 500 13px/1.3 var(--sans); color: var(--muted); }
+.dd-n { font: 400 32px/1 var(--display); font-variant-numeric: tabular-nums; color: var(--ink); }
+.dd-m { font: 400 13px/1.3 var(--sans); color: var(--muted); }
+.day-entries { display: grid; min-width: 0; }
+.entry { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 16px; padding: 18px 24px 18px 12px; transition: background-color 150ms var(--ease); }
+.entry + .entry { border-top: 1px solid var(--line); }
+.entry:hover { background: color-mix(in srgb, var(--primary-soft) 50%, transparent); }
+@media (max-width: 480px) {
+  .day-group { grid-template-columns: 60px minmax(0, 1fr); }
+  .day-date { padding-left: 16px; }
+  .dd-n { font-size: 28px; }
+  .entry { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 18px 16px 18px 4px; }
+  .entry .fields { grid-column: 1 / -1; }
+  .entry .flag-btn { grid-column: 2; grid-row: 1; }
+  .journal-head h3 { font-size: 24px; }
+  .journal-head { flex-wrap: wrap; }
+  .new-entry { flex-basis: 100%; margin-left: 0; margin-top: 8px; padding-block: 12px; }
+  .entry .entry-time { display: flex; gap: 12px; align-items: center; }
+  .fields { grid-template-columns: 68px minmax(0, 1fr); gap: 4px 12px; }
+  .fields .k { font-size: 13px; }
+}
+.entry-time { font: 400 14px/1.7 var(--sans); font-variant-numeric: tabular-nums; color: var(--muted); display: grid; gap: 6px; align-content: start; }
+/* Food / Symptoms / Context: same three rows on every entry, here and in the summary */
+.fields { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 6px 16px; align-items: baseline; margin: 0; min-width: 0; }
+.fields .k { font: 400 14px/1.6 var(--sans); color: var(--muted); }
+.fields .v { margin: 0; font: 400 16px/1.6 var(--sans); max-width: 60ch; }
+.fields .none { color: var(--muted); }
+.maps { font-size: 13px; color: var(--muted); }
+.maps code { font: 12px ui-monospace, Menlo, monospace; }
+
+/* appointment reminder (Suggestion) */
+.appt { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 14px 24px; background: var(--surface-warm); border-bottom: 1px solid var(--line); }
+.appt-msg { display: flex; gap: 10px; align-items: flex-start; max-width: 62ch; min-width: 0; }
+.appt-msg svg { width: 18px; height: 18px; flex: none; margin-top: 3px; color: var(--primary); }
+.appt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.appt-edit { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.appt-edit label { font: 500 14px var(--sans); }
+.input { font: 400 16px/1.4 var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 10px 12px; width: 100%; min-width: 0; transition: border-color 150ms var(--ease); }
+.input:hover { border-color: var(--muted); }
+.appt-edit .input { width: auto; }
+.input:not(textarea) { height: 44px; }
+.field textarea.input { resize: vertical; min-height: 44px; height: 44px; padding: 10px 12px; font: 400 16px/1.4 var(--sans); }
+
+/* new entry dialog (Reduction, one entry at a time) */
+.new-entry { margin-left: auto; }
+.entry-dlg { width: min(560px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--line); border-radius: var(--r-sheet); background: var(--surface); color: var(--ink); box-shadow: 0 16px 48px rgb(0 0 0 / 0.16), 0 2px 6px rgb(0 0 0 / 0.08); overflow: hidden; }
+.entry-dlg::backdrop { background: rgb(10 16 18 / 0.45); }
+.entry-dlg[open] { animation: dlg-in 200ms ease-out; }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.entry-form { display: flex; flex-direction: column; max-height: inherit; }
+.dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px 12px; }
+.dlg-head h2 { font: 400 26px/1.1 var(--display); letter-spacing: -0.02em; }
+.dlg-head .icon-btn { width: 44px; height: 44px; }
+.dlg-body { display: grid; gap: 20px; padding: 8px 24px 20px; overflow-y: auto; }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--line); }
+.q-stack { display: grid; gap: 20px; }
+.q-stack .field { align-content: start; }
+.q-stack .field label, .q-stack legend { font: 500 14px/1.4 var(--sans); }
+.q-stack .hint { font-size: 13px; color: var(--muted); }
+.q-error { display: flex; gap: 10px; align-items: flex-start; color: var(--ink); background: var(--surface); border: 1px solid var(--ink); border-radius: var(--r-card); padding: 10px 12px; font: 500 14px/1.5 var(--sans); }
+.q-error svg { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.q-error[hidden] { display: none; }
+.input[aria-invalid="true"] { border-color: var(--ink); border-width: 2px; padding: 9px 11px; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { padding: 0; margin-bottom: 6px; }
+@media (max-width: 480px) {
+  .entry-dlg { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: var(--r-sheet) var(--r-sheet) 0 0; border-bottom: 0; max-height: calc(100dvh - 24px); }
+  .dlg-foot { padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .dlg-foot .btn { flex: 1; }
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-btn { font: 500 13px/1 var(--sans); padding: 8px 12px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease); }
+.chip-btn:hover { border-color: var(--muted); color: var(--ink); }
+.chip-btn[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-soft); color: var(--ink); }
+.time-sev { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-start; }
+.time-sev .field { width: 132px; }
+.time-sev .field.date { width: 168px; }
+.when .sev { flex-basis: 100%; }
+.when .time-sev .field label { font-weight: 400; color: var(--muted); }
+.sev summary { cursor: pointer; font: 500 14px/1.4 var(--sans); color: var(--primary); padding-block: 12px 4px; list-style: none; width: fit-content; }
+.sev summary::-webkit-details-marker { display: none; }
+.sev[open] summary { padding-top: 0; margin-bottom: 6px; color: var(--ink); }
+.sev-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.sev-opt { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 7px 12px; border: 1px solid var(--line); border-radius: var(--r-pill); cursor: pointer; transition: border-color 150ms var(--ease), background-color 150ms var(--ease); }
+.sev-opt:hover { border-color: var(--muted); }
+.sev-opt:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+.sev-opt input { accent-color: var(--primary); margin: 0; }
+.sev-note { color: var(--muted); }
+.empty-note { padding: 18px 24px; color: var(--muted); }
+
+/* toast (Self-Monitoring feedback) */
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 10; max-width: calc(100% - 32px); transform: translate(-50%, 8px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); font: 500 14px/1.4 var(--sans); padding: 12px 18px; border-radius: var(--r-pill); box-shadow: 0 8px 24px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08); transition: opacity 200ms ease-out, transform 200ms ease-out; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* summary sheet */
+.sheet { background: var(--surface-warm); border: 1px solid var(--line); border-radius: var(--r-sheet); padding: clamp(20px, 5vw, 44px); display: grid; gap: 28px; }
+.sum-head { display: grid; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.fields.sum-meta { grid-template-columns: 104px minmax(0, 1fr); }
+.sheet h3.title { font: 400 36px/1.05 var(--display); letter-spacing: -0.03em; }
+.sheet .part { display: grid; gap: 10px; }
+.qs { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.q-input { display: block; font: 400 16px/1.5 var(--sans); color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 8px 0; width: 100%; resize: none; overflow: hidden; field-sizing: content; transition: border-color 150ms var(--ease); }
+.q-input:hover { border-bottom-color: var(--muted); }
+.export { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding-top: 20px; border-top: 1px solid var(--line); }
+/* Worth flagging on screen: same day-grouped layout as the journal */
+.flags { border-block: 1px solid var(--line); }
+.sheet .day-date { padding-left: 0; }
+.sheet .entry { padding-right: 0; }
+.sheet .entry:hover { background: none; }
+.incl { display: inline-flex; gap: 8px; align-items: center; align-self: start; font: 500 13px/1 var(--sans); color: var(--muted); padding: 7px 12px 7px 10px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface); cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease); }
+.incl:hover { border-color: var(--muted); color: var(--ink); }
+.incl:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); color: var(--ink); }
+.incl:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 2px; }
+.incl input { accent-color: var(--primary); width: 16px; height: 16px; margin: 0; cursor: pointer; }
+.incl input:focus-visible { outline: none; }
+.entry .fields { transition: opacity 150ms var(--ease); }
+.entry:has(.incl input:not(:checked)) .fields { opacity: .5; }
+.excl-note { grid-column: 2; font-size: 13px; color: var(--muted); display: none; }
+.entry:has(.incl input:not(:checked)) .excl-note { display: block; }
+.flags-empty { padding: 16px 0; color: var(--muted); }
+@media (max-width: 480px) {
+  .entry .incl { grid-column: 2; grid-row: 1; }
+  .excl-note { grid-column: 1 / -1; }
+}
+
+/* PDF preview: the exported document keeps the compact list, always on white paper */
+.pdf-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+@media (max-width: 480px) {
+  .export .btn { flex: 1 1 100%; }
+}
+.pdf-toggle svg { width: 14px; height: 14px; transition: transform 150ms var(--ease); }
+.pdf-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.pdf-body { display: grid; gap: 12px; }
+.paper { max-width: 680px; display: grid; gap: 22px; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--paper-line); border-radius: 4px; padding: clamp(24px, 5vw, 48px); box-shadow: 0 8px 24px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.06); font: 400 14px/1.55 var(--sans); }
+.paper h4 { margin: 0; font: 400 28px/1.1 var(--display); letter-spacing: -0.02em; }
+.paper h5 { margin: 0 0 8px; font: 600 14px/1.4 var(--sans); }
+.paper p { max-width: 62ch; }
+.p-meta, .p-fields { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 2px 12px; margin: 0; }
+.p-fields { grid-template-columns: 72px minmax(0, 1fr); }
+.p-meta dt, .p-fields dt { color: var(--paper-muted); }
+.p-meta dd, .p-fields dd { margin: 0; }
+.p-meta { padding-bottom: 18px; border-bottom: 1px solid var(--paper-line); }
+.p-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--paper-line); }
+.p-row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--paper-line); }
+.p-row time { color: var(--paper-muted); font-variant-numeric: tabular-nums; }
+.paper .none { color: var(--paper-muted); }
+.p-q { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+@media (max-width: 480px) {
+  .p-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .p-meta { grid-template-columns: 88px minmax(0, 1fr); }
+}
+
+/* take / leave */
+.list { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.list li { display: grid; gap: 2px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.list strong { font-weight: 500; }
+
+/* shape and motion */
+.shapes { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; }
+.shape { display: grid; gap: 8px; justify-items: start; }
+.shape .s { width: 120px; height: 72px; border: 1px solid var(--line); background: var(--surface); }
+.space-ladder { display: grid; gap: 6px; }
+.space-ladder div { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
+.space-ladder i { display: block; height: 10px; background: var(--primary); border-radius: 2px; }
+.floaty { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sheet); padding: 16px 20px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.06); max-width: 280px; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+
+<main>
+  <div class="intro">
+    <div class="topbar">
+      <div class="seg" role="group" aria-label="Preview theme">
+        <button type="button" id="th-system" data-t="system" aria-pressed="true">System</button>
+        <button type="button" id="th-light" data-t="light" aria-pressed="false">Light</button>
+        <button type="button" id="th-dark" data-t="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
+    <h1>A calm notebook a clinician would respect.</h1>
+    <p class="lede">One quiet serif for the moments that matter, a plain grotesque for everything else, warm-neutral paper, one deep green, hairline structure. This page is set in Steady's own tokens, so what you see is the design. Drawn from polarity.so, cohere.com and ada.cx.</p>
+  </div>
+
+  <section aria-labelledby="h-color">
+    <div class="palette-head">
+      <h2 id="h-color">Color</h2>
+      <p class="small muted">Swatches follow the theme switch above. Ratios are against the page background, except text on green.</p>
+    </div>
+    <div class="swatches" id="swatches"></div>
+    <p class="small muted" style="max-width:62ch">There is no semantic red in the journal or the summary. Flagged entries use the green plus an icon and the word "Flagged". Red appears only on a real destructive action, like deleting the account.</p>
+  </section>
+
+  <section aria-labelledby="h-type">
+    <h2 id="h-type">Type</h2>
+    <div>
+      <div class="spec"><div class="label">Display · Newsreader 48/1.0, -3%</div><div class="t-display">Here is your week.</div></div>
+      <div class="spec"><div class="label">Heading · Hanken 24/1.25, 500</div><div class="t-heading">Pattern observed</div></div>
+      <div class="spec"><div class="label">Body · Hanken 16/1.6, 400</div><div class="t-body">Oat porridge with banana. Felt bloated about an hour later, eased off by lunch. Busy morning at work.</div></div>
+      <div class="spec"><div class="label">Small · Hanken 14/1.5</div><div class="t-small muted">Logged Tuesday 13 October at 08:40</div></div>
+      <div class="spec"><div class="label">Label · Hanken 12, 500, +2%</div><div class="t-label">Context: stress</div></div>
+    </div>
+    <p class="small muted" style="max-width:62ch">The serif is reserved for screen titles, the screener result, and the summary title. Display lines stay plain: no italic, bold, or color for emphasis. Everything else is the sans, at weights 400 and 500.</p>
+  </section>
+
+  <section aria-labelledby="h-comp">
+    <h2 id="h-comp">Controls</h2>
+    <div class="row">
+      <button type="button" class="btn btn-primary">Add entry</button>
+      <button type="button" class="btn btn-secondary">Choose dates</button>
+      <button type="button" class="btn btn-quiet">Skip for now</button>
+    </div>
+    <div class="row">
+      <span class="tag on">stress</span><span class="tag">travel</span><span class="tag">sleep</span><span class="tag">cycle</span>
+      <button type="button" class="flag-btn" id="flag-demo-a" aria-pressed="false" aria-label="Flag for appointment summary"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 14V2.5M3.5 3h8l-1.6 3 1.6 3h-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="fl-t">Flag</span></button>
+      <button type="button" class="flag-btn" id="flag-demo-b" aria-pressed="true" aria-label="Flag for appointment summary"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 14V2.5M3.5 3h8l-1.6 3 1.6 3h-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="fl-t">Flagged</span></button>
+    </div>
+    <div class="field" style="max-width:520px">
+      <label for="f-symptom">Symptoms</label>
+      <textarea id="f-symptom">Some cramping in the afternoon, better after a walk.</textarea>
+      <span class="hint">Optional. In your own words.</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-screens">
+    <div class="palette-head"><h2 id="h-screens">Screens</h2><span class="example">Example content</span></div>
+
+    <div class="grid two">
+      <div class="screen">
+        <p class="q">In the past month, how often have you skipped a meal on purpose?</p>
+        <div class="choices" role="radiogroup" aria-label="Answer">
+          <label class="choice"><input type="radio" name="q" id="q-a">Never</label>
+          <label class="choice"><input type="radio" name="q" id="q-b" checked>Once or twice</label>
+          <label class="choice"><input type="radio" name="q" id="q-c">Most weeks</label>
+        </div>
+        <div class="row"><button type="button" class="btn btn-primary">Continue</button><span class="small muted num">Question 2 of 5</span></div>
+      </div>
+
+      <div class="result">
+        <p class="say">Let's talk this through with someone first.</p>
+        <p class="t-body muted">Your answers suggest it's worth speaking with a dietitian or your doctor before starting a restrictive plan. This isn't a diagnosis. You can keep using the journal as usual.</p>
+        <div class="row"><button type="button" class="btn btn-primary">See who can help</button><button type="button" class="btn btn-quiet">Back to journal</button></div>
+      </div>
+    </div>
+
+    <div class="journal">
+      <div class="appt" id="appt">
+        <p class="appt-msg"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span id="appt-text">Your appointment is on Tuesday 20 October. 3 flagged entries are ready to review.</span></p>
+        <div class="appt-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="appt-review">Review summary</button>
+          <button type="button" class="btn btn-quiet btn-sm" id="appt-change" aria-expanded="false" aria-controls="appt-edit">Change date</button>
+        </div>
+        <div class="appt-edit" id="appt-edit" hidden>
+          <label for="appt-input">Next appointment</label>
+          <input class="input" type="date" id="appt-input" value="2026-10-20" min="2026-10-18">
+        </div>
+      </div>
+      <div class="journal-head">
+        <button type="button" class="icon-btn" id="wk-prev" aria-label="Previous week, 5-11 October"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h3 id="wk-title">October 2026</h3>
+        <button type="button" class="icon-btn" id="wk-next" aria-label="Next week, 19-25 October" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="btn btn-primary btn-sm new-entry" id="new-entry" aria-haspopup="dialog">New entry</button>
+      </div>
+      <p class="journal-obs muted">This week: 3 of 7 logged days mentioned bloating.</p>
+      <ol class="week" aria-label="Days of the week, 12-18 October">
+        <li><button type="button" class="wd" id="wd-12" aria-pressed="false" aria-label="Mon 12 October"><span class="wd-d">Mon</span><span class="wd-n">12</span><span class="wd-m"><i></i></span><span class="wd-w"></span></button></li>
+        <li><button type="button" class="wd" id="wd-13" aria-pressed="true" aria-label="Tue 13 October"><span class="wd-d">Tue</span><span class="wd-n">13</span><span class="wd-m"><i></i></span><span class="wd-w"></span></button></li>
+        <li><button type="button" class="wd" id="wd-14" aria-pressed="false" aria-label="Wed 14 October"><span class="wd-d">Wed</span><span class="wd-n">14</span><span class="wd-m"><i></i></span><span class="wd-w"></span></button></li>
+        <li><button type="button" class="wd" id="wd-15" aria-pressed="false" aria-label="Thu 15 October"><span class="wd-d">Thu</span><span class="wd-n">15</span><span class="wd-m"><i></i></span><span class="wd-w"></span></button></li>
+        <li><button type="button" class="wd" id="wd-16" aria-pressed="false" aria-label="Fri 16 October"><span class="wd-d">Fri</span><span class="wd-n">16</span><span class="wd-m"><i></i></span><span class="wd-w"></span></button></li>
+        <li><button type="button" class="wd" id="wd-17" aria-pressed="false" aria-label="Sat 17 October"><span class="wd-d">Sat</span><span class="wd-n">17</span><span class="wd-m"><i></i></span><span class="wd-w"></span></button></li>
+        <li><button type="button" class="wd" id="wd-18" aria-pressed="false" aria-label="Sun 18 October"><span class="wd-d">Sun</span><span class="wd-n">18</span><span class="wd-m"><i></i></span><span class="wd-w"></span></button></li>
+      </ol>
+      <div class="days" id="days" aria-label="Journal entries"></div>
+    </div>
+    <dialog class="entry-dlg" id="entry-dlg" aria-labelledby="dlg-title">
+        <form class="entry-form" id="quick" method="dialog" novalidate aria-describedby="q-error">
+          <div class="dlg-head">
+            <h2 id="dlg-title">New entry</h2>
+            <button type="button" class="icon-btn" id="dlg-close" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          </div>
+          <div class="dlg-body">
+            <p class="q-error" id="q-error" role="alert" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5v4.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="11.2" r="0.9" fill="currentColor"/></svg><span>This entry is empty. Add what you ate, a symptom, or both.</span></p>
+          <div class="q-stack">
+            <div class="field"><label for="q-food">Food</label><input class="input" type="text" id="q-food" autocomplete="off"></div>
+            <div class="field"><label for="q-sym">Symptoms</label><textarea class="input" id="q-sym" rows="1"></textarea><span class="hint">Leave empty if nothing to note.</span></div>
+            <fieldset>
+              <legend>Context</legend>
+              <div class="chips" id="q-ctx">
+                <button type="button" class="chip-btn" id="ctx-stress" aria-pressed="false">Stress</button>
+                <button type="button" class="chip-btn" id="ctx-travel" aria-pressed="false">Travel</button>
+                <button type="button" class="chip-btn" id="ctx-sleep" aria-pressed="false">Sleep</button>
+                <button type="button" class="chip-btn" id="ctx-cycle" aria-pressed="false">Cycle</button>
+              </div>
+            </fieldset>
+            <fieldset class="when"><legend>When</legend><div class="time-sev">
+              <div class="field date"><label for="q-date">Date</label><input class="input" type="date" id="q-date" value="2026-10-18" max="2026-10-18"></div>
+              <div class="field"><label for="q-time">Time</label><input class="input" type="time" id="q-time" value="14:05"></div>
+              <details class="sev" id="q-sev">
+                <summary>Add severity</summary>
+                <fieldset>
+                  <legend class="sr">Severity</legend>
+                  <div class="sev-opts">
+                    <label class="sev-opt"><input type="radio" name="sev" id="sev-low" value="low">Low</label>
+                    <label class="sev-opt"><input type="radio" name="sev" id="sev-med" value="medium">Medium</label>
+                    <label class="sev-opt"><input type="radio" name="sev" id="sev-high" value="high">High</label>
+                  </div>
+                </fieldset>
+              </details>
+            </div></fieldset>
+          </div>
+          </div>
+          <div class="dlg-foot">
+            <button type="button" class="btn btn-quiet" id="q-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="q-save">Save entry</button>
+          </div>
+        </form>
+    </dialog>
+    <p class="maps">Reminder: React Aria <code>DateField</code> for the appointment date, shown two days before. New entry: a <code>Modal</code> with a <code>Dialog</code> (bottom sheet on phones), <code>Form</code>, <code>TextField</code>, a <code>ToggleButtonGroup</code> for context, <code>DateField</code> and <code>TimeField</code>, and a <code>Disclosure</code> for severity. Week strip: <code>ToggleButtonGroup</code>. Entries: one <code>GridList</code> per day. Flag: <code>ToggleButton</code>, confirmed in a polite live region.</p>
+
+    <article class="sheet" id="summary" tabindex="-1" aria-labelledby="sum-title">
+      <div class="sum-head">
+        <h3 class="title" id="sum-title">Appointment summary</h3>
+        <dl class="fields sum-meta">
+          <dt class="k">For</dt><dd class="v">Dr. Osei, primary care</dd>
+          <dt class="k">Period</dt><dd class="v num">15 September to 18 October 2026, since your last summary</dd>
+          <dt class="k">Appointment</dt><dd class="v num" id="sum-appt">Tuesday 20 October 2026</dd>
+        </dl>
+      </div>
+      <div class="part">
+        <h3>Pattern observed</h3>
+        <p class="num" id="pattern">22 entries across 34 days. Symptoms noted on 11 days, most often bloating and cramping.</p>
+      </div>
+      <div class="part">
+        <h3>Worth flagging</h3>
+        <p class="small muted">Entries you flagged in your journal. Untick Include to leave one out of this summary.</p>
+        <div class="flags" id="flags"></div>
+        <div id="flags-end" aria-hidden="true"></div>
+      </div>
+      <div class="part">
+        <h3>Questions to bring</h3>
+        <p class="small muted">Edit them in place or add your own. Empty ones are left out.</p>
+        <ul class="qs" id="qs">
+          <li><textarea class="q-input" id="qe-0" rows="1" aria-label="Question 1">Symptoms seem to show up on high-stress days. Is that worth looking into?</textarea></li>
+          <li><textarea class="q-input" id="qe-1" rows="1" aria-label="Question 2">I've skipped meals a few times. Could that be affecting things?</textarea></li>
+        </ul>
+        <div class="row"><button type="button" class="btn btn-quiet btn-sm" id="q-add">Add a question</button></div>
+      </div>
+      <div class="export">
+        <button type="button" class="btn btn-primary" id="export" disabled>Reviewed, export PDF</button>
+        <span class="small muted" id="export-hint">Read through Worth flagging to continue.</span>
+        <button type="button" class="btn btn-secondary pdf-toggle" id="pdf-toggle" aria-expanded="false" aria-controls="pdf-body" hidden><span class="pdf-toggle-t">Show PDF preview</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="pdf-body" id="pdf-body" hidden>
+        <p class="muted">This is what "Reviewed, export PDF" gives your provider. Only included entries and filled-in questions appear.</p>
+        <div class="paper" id="pdf" role="document" aria-label="PDF preview"></div>
+      </div>
+    </article>
+    <p class="maps">Worth flagging on screen: the journal's day layout, one React Aria <code>GridList</code> per day with an Include <code>Checkbox</code> where the journal has Flag. The PDF keeps the compact list: date, Food, Symptoms, no controls, shown by a <code>Disclosure</code> button that takes the place of the hint beside Export once the review is done, closed by default. Export sits at the end of the sheet and stays disabled until Worth flagging has been on screen (spec 3.4).</p>
+  </section>
+
+  <section aria-labelledby="h-shape">
+    <h2 id="h-shape">Space, shape, depth, motion</h2>
+    <div class="grid three">
+      <div class="space-ladder" aria-label="Spacing ladder">
+        <div><i style="width:4px"></i>4</div><div><i style="width:8px"></i>8</div><div><i style="width:12px"></i>12</div>
+        <div><i style="width:16px"></i>16</div><div><i style="width:24px"></i>24</div><div><i style="width:40px"></i>40</div><div><i style="width:64px"></i>64</div>
+      </div>
+      <div class="shapes">
+        <div class="shape"><div class="s" style="border-radius:8px"></div><span class="label">8 · cards, inputs</span></div>
+        <div class="shape"><div class="s" style="border-radius:16px"></div><span class="label">16 · sheets</span></div>
+        <div class="shape"><div class="s" style="border-radius:9999px;height:44px"></div><span class="label">pill · buttons, tags</span></div>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <div class="floaty"><p class="small">The only shadow: menus and dialogs that float above the page.</p></div>
+        <p class="small muted">Cards use hairlines only. Hover any control for the 150ms ease. Nothing loops, and reduced motion turns it all off.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-refs">
+    <h2 id="h-refs">From the references</h2>
+    <div class="grid two">
+      <div style="display:grid;gap:12px;align-content:start">
+        <h3>Taken</h3>
+        <ul class="list">
+          <li><strong>Serif display over a grotesque</strong><span class="small muted">Polarity: Exposure 48px, -3.36px tracking. Cohere: 96px hero serif.</span></li>
+          <li><strong>Deep green and warm neutrals</strong><span class="small muted">Cohere's #39594d, #fafafa, #f0eee9, #212121.</span></li>
+          <li><strong>Hairlines, no shadows</strong><span class="small muted">Polarity: 1px borders, zero box-shadows.</span></li>
+          <li><strong>Pills for buttons and chips</strong><span class="small muted">Cohere: 9999px radius. Ada: selected chip is a green tint with a green border.</span></li>
+          <li><strong>Sage green for dark mode</strong><span class="small muted">Ada: #8fbe8e with dark text, 7.52:1 on slate #16242a (sampled).</span></li>
+          <li><strong>150ms ease on color and opacity</strong><span class="small muted">Polarity and Cohere, same curve.</span></li>
+        </ul>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <h3>Left out</h3>
+        <ul class="list">
+          <li><strong>Coral and terracotta</strong><span class="small muted">Cohere #ff7759 is 2.61:1 on white. Both read as a warning.</span></li>
+          <li><strong>Big stat tiles, live counters</strong><span class="small muted">Large symptom numbers would read as a score.</span></li>
+          <li><strong>Food photography</strong><span class="small muted">Pictures of food invite judging food.</span></li>
+          <li><strong>Dark hero bands, looping animation</strong><span class="small muted">Users may open the app anxious or unwell.</span></li>
+          <li><strong>Uppercase eyebrow labels</strong><span class="small muted">Ada's tracked caps above headings. Plain sentence-case labels read calmer.</span></li>
+          <li><strong>Italic emphasis words</strong><span class="small muted">Ada's "For real businesses". Reads as marketing, not clinical.</span></li>
+          <li><strong>Glass panels, blurred photos, dark-first</strong><span class="small muted">Ada's look. Steady takes only its colors, for dark mode.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const tokens = [
+  ["--bg", "Page"], ["--surface", "Cards, entries"], ["--surface-warm", "Summary paper"],
+  ["--ink", "Text"], ["--muted", "Secondary text"], ["--line", "Hairlines"],
+  ["--primary", "Brand, actions, focus"], ["--on-primary", "Text on green"]
+];
+const lin = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+const probe = document.createElement("span");
+document.body.appendChild(probe);
+function rgb(varName) {
+  probe.style.color = `var(${varName})`;
+  const m = getComputedStyle(probe).color.match(/[\d.]+/g).map(Number);
+  return m;
+}
+function hex([r, g, b, a]) {
+  const h = "#" + [r, g, b].map(n => Math.round(n).toString(16).padStart(2, "0")).join("");
+  return a !== undefined && a < 1 ? `${h} @ ${Math.round(a * 100)}%` : h;
+}
+function render() {
+  const bg = rgb("--bg");
+  const wrap = document.getElementById("swatches");
+  wrap.innerHTML = "";
+  for (const [v, role] of tokens) {
+    const c = rgb(v);
+    const opaque = c[3] === undefined || c[3] === 1;
+    const ref = v === "--on-primary" ? rgb("--primary") : bg;
+    const [x, y] = [lum(c), lum(ref)].sort((p, q) => q - p);
+    const ratio = opaque ? ((x + 0.05) / (y + 0.05)).toFixed(2) + ":1" : "translucent";
+    const onChip = lum(c) > 0.35 ? "#212121" : "#fafafa";
+    const el = document.createElement("div");
+    el.className = "sw";
+    el.innerHTML = `<div class="chip" style="background:var(${v});color:${opaque ? onChip : "var(--ink)"}">${role}</div>
+      <div class="meta"><code>${v}</code><span class="small muted num">${hex(c)} · ${v === "--bg" ? "background" : v === "--on-primary" ? ratio + " on primary" : ratio}</span></div>`;
+    wrap.appendChild(el);
+  }
+}
+function setTheme(t) {
+  if (t === "system") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", t);
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === t)));
+  try { localStorage.setItem("steady-theme", t); } catch (e) {}
+  render();
+}
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => setTheme(b.dataset.t)));
+let saved = "system";
+try { saved = localStorage.getItem("steady-theme") || "system"; } catch (e) {}
+setTheme(saved);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+document.querySelectorAll('[id^="flag-demo"]').forEach(b => b.addEventListener("click", () => {
+  const on = b.getAttribute("aria-pressed") !== "true";
+  b.setAttribute("aria-pressed", String(on));
+  b.querySelector(".fl-t").textContent = on ? "Flagged" : "Flag";
+}));
+document.querySelectorAll(".wd").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".wd").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+}));
+/* ---------- journal, flags, reminder, summary: one shared list of entries (example data) ---------- */
+const TODAY = "2026-10-18";
+const WEEK = ["2026-10-12", "2026-10-18"];
+const RANGE = ["2026-09-15", "2026-10-18"];
+const BASE = { entries: 22, symptomDays: 11, bloatDays: [13, 15, 17] };
+const entries = [
+  { id: "e1", date: "2026-10-13", time: "08:40", food: "Oat porridge with banana and a coffee.", sym: "Bloated about an hour later, eased off by lunch.", sev: "", ctx: ["Stress"], flagged: false, included: true },
+  { id: "e2", date: "2026-10-14", time: "12:30", food: "Didn't eat lunch.", sym: "", sev: "", ctx: ["Stress"], flagged: false, included: true },
+  { id: "e3", date: "2026-10-14", time: "19:10", food: "Pasta with tomato sauce.", sym: "Cramping in the evening. Not much sleep.", sev: "", ctx: ["Sleep"], flagged: true, included: true },
+  { id: "e4", date: "2026-10-07", time: "20:15", food: "Takeaway curry with friends.", sym: "Bloated late at night.", sev: "", ctx: [], flagged: true, included: false },
+  { id: "e5", date: "2026-10-01", time: "14:00", food: "Skipped breakfast, sandwich at 2pm.", sym: "Bloated through the afternoon.", sev: "", ctx: [], flagged: true, included: true }
+];
+let added = 0;
+let appt = "2026-10-20";
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const d = iso => new Date(iso + "T00:00:00Z");
+const fmt = (iso, o) => d(iso).toLocaleDateString("en-GB", { ...o, timeZone: "UTC" });
+const inRange = (iso, [a, b]) => iso >= a && iso <= b;
+const byNewest = (a, b) => (b.date + b.time).localeCompare(a.date + a.time);
+const FLAG_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 14V2.5M3.5 3h8l-1.6 3 1.6 3h-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+const longDate = iso => fmt(iso, { weekday: "long", day: "numeric", month: "long" });
+function fieldsHTML(e) {
+  return `<dl class="fields">
+            <dt class="k">Food</dt>${e.food ? `<dd class="v">${esc(e.food)}</dd>` : '<dd class="v none">None noted</dd>'}
+            <dt class="k">Symptoms</dt>${e.sym ? `<dd class="v">${esc(e.sym)}${e.sev ? ` <span class="sev-note">· Severity ${esc(e.sev)}</span>` : ""}</dd>` : '<dd class="v none">None noted</dd>'}
+            <dt class="k">Context</dt>${e.ctx.length ? `<dd class="v">${esc(e.ctx.join(", "))}</dd>` : '<dd class="v none">None</dd>'}
+          </dl>`;
+}
+/* One renderer for both the journal and Worth flagging; only the control on the right differs */
+function daysHTML(list, control, extra = () => "") {
+  const days = [...new Set(list.map(e => e.date))];
+  return days.map(day => `
+    <div class="day-group" role="group" aria-label="${longDate(day)}">
+      <div class="day-date" aria-hidden="true"><span class="dd-w">${fmt(day, { weekday: "short" })}</span><span class="dd-n">${d(day).getUTCDate()}</span><span class="dd-m">${fmt(day, { month: "short" })}</span></div>
+      <div class="day-entries">${list.filter(e => e.date === day).map(e => `
+        <div class="entry">
+          <div class="entry-time"><time>${esc(e.time)}</time></div>
+          ${fieldsHTML(e)}
+          ${control(e)}${extra(e)}
+        </div>`).join("")}
+      </div>
+    </div>`).join("");
+}
+
+function renderJournal() {
+  const week = entries.filter(e => inRange(e.date, WEEK)).sort(byNewest);
+  $("days").innerHTML = daysHTML(week, e =>
+    `<button type="button" class="flag-btn" id="flag-${e.id}" data-id="${e.id}" aria-pressed="${e.flagged}" aria-label="Flag for appointment summary">${FLAG_SVG}<span class="fl-t">${e.flagged ? "Flagged" : "Flag"}</span></button>`
+  ) || '<p class="empty-note">No entries this week yet.</p>';
+
+  const bloat = new Set(BASE.bloatDays);
+  week.forEach(e => { if (/bloat/i.test(e.sym)) bloat.add(d(e.date).getUTCDate()); });
+  document.querySelectorAll(".wd").forEach(b => {
+    const n = Number(b.querySelector(".wd-n").textContent);
+    const on = bloat.has(n);
+    b.querySelector(".wd-m i").classList.toggle("on", on);
+    b.querySelector(".wd-w").textContent = on ? "Bloating" : "";
+    b.setAttribute("aria-label", `${b.querySelector(".wd-d").textContent} ${n} October${on ? ", bloating mentioned" : ""}`);
+  });
+  document.querySelector(".journal-obs").textContent = `This week: ${bloat.size} of 7 logged days mentioned bloating.`;
+}
+
+function renderSummary() {
+  const flagged = entries.filter(e => e.flagged && inRange(e.date, RANGE)).sort(byNewest);
+  $("flags").innerHTML = daysHTML(flagged,
+    e => `<label class="incl"><input type="checkbox" id="inc-${e.id}" data-id="${e.id}"${e.included ? " checked" : ""} aria-label="Include ${longDate(e.date)}, ${esc(e.time)} in this summary">Include</label>`,
+    () => '<p class="excl-note">Left out of this summary. Still in your journal.</p>'
+  ) || '<p class="flags-empty">Nothing flagged yet. Use Flag on a journal entry to add it here.</p>';
+  const isNew = e => e.id.startsWith("n");
+  const known = new Set(entries.filter(e => !isNew(e) && e.sym).map(e => e.date).concat(BASE.bloatDays.map(n => `2026-10-${n}`)));
+  const newSymDays = new Set(entries.filter(e => isNew(e) && e.sym && inRange(e.date, RANGE) && !known.has(e.date)).map(e => e.date)).size;
+  const newCount = entries.filter(e => isNew(e) && inRange(e.date, RANGE)).length;
+  $("pattern").textContent = `${BASE.entries + newCount} entries across 34 days. Symptoms noted on ${BASE.symptomDays + newSymDays} days, most often bloating and cramping.`;
+}
+
+function renderAppt() {
+  const n = entries.filter(e => e.flagged && inRange(e.date, RANGE)).length;
+  const when = fmt(appt, { weekday: "long", day: "numeric", month: "long" });
+  const daysAway = Math.round((d(appt) - d(TODAY)) / 86400000);
+  const count = n === 1 ? "1 flagged entry" : `${n} flagged entries`;
+  const soon = daysAway <= 2;
+  $("appt-text").textContent = soon
+    ? `Your appointment is on ${when}. ${count} ${n === 1 ? "is" : "are"} ready to review.`
+    : `Next appointment: ${when}. A reminder to review your summary will show here two days before. ${count} so far.`;
+  $("appt-review").hidden = !soon;
+  $("sum-appt").textContent = `${fmt(appt, { weekday: "long" })} ${fmt(appt, { day: "numeric", month: "long", year: "numeric" })}`;
+}
+
+function renderPdf() {
+  const inc = entries.filter(e => e.flagged && e.included && inRange(e.date, RANGE)).sort(byNewest);
+  const qs = [...document.querySelectorAll("#qs .q-input")].map(q => q.value.trim()).filter(Boolean);
+  const v = t => t ? `<dd>${esc(t)}</dd>` : '<dd class="none">None noted</dd>';
+  $("pdf").innerHTML = `
+    <h4>Appointment summary</h4>
+    <dl class="p-meta">
+      <dt>For</dt><dd>Dr. Osei, primary care</dd>
+      <dt>Period</dt><dd>15 September to 18 October 2026, since your last summary</dd>
+      <dt>Appointment</dt><dd>${esc($("sum-appt").textContent)}</dd>
+    </dl>
+    <div><h5>Pattern observed</h5><p>${esc($("pattern").textContent)}</p></div>
+    <div><h5>Worth flagging</h5>${inc.length ? `<ul class="p-list">${inc.map(e => `
+      <li class="p-row"><time>${fmt(e.date, { day: "numeric", month: "short" })}</time><dl class="p-fields"><dt>Food</dt>${v(e.food)}<dt>Symptoms</dt>${v(e.sym)}</dl></li>`).join("")}</ul>` : '<p class="none">No entries included.</p>'}</div>
+    <div><h5>Questions to bring</h5>${qs.length ? `<ul class="p-q">${qs.map(q => `<li>${esc(q)}</li>`).join("")}</ul>` : '<p class="none">No questions added.</p>'}</div>`;
+}
+
+function renderAll() { renderJournal(); renderSummary(); renderAppt(); renderPdf(); }
+
+/* Flag toggle: journal is re-rendered, so use one delegated listener */
+$("days").addEventListener("click", ev => {
+  const b = ev.target.closest(".flag-btn");
+  if (!b) return;
+  const e = entries.find(x => x.id === b.dataset.id);
+  e.flagged = !e.flagged;
+  if (e.flagged) e.included = true;
+  renderAll();
+  $("flag-" + e.id).focus();
+  toast(e.flagged ? "Added to your appointment summary." : "Removed from your appointment summary.");
+});
+$("flags").addEventListener("change", ev => {
+  const e = entries.find(x => x.id === ev.target.dataset.id);
+  if (e) { e.included = ev.target.checked; renderPdf(); }
+});
+
+/* Reminder */
+$("appt-review").addEventListener("click", () => {
+  const sheet = $("summary");
+  sheet.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  sheet.focus({ preventScroll: true });
+});
+$("appt-change").addEventListener("click", () => {
+  const open = $("appt-edit").hidden;
+  $("appt-edit").hidden = !open;
+  $("appt-change").setAttribute("aria-expanded", String(open));
+  $("appt-change").textContent = open ? "Done" : "Change date";
+  if (open) $("appt-input").focus();
+});
+$("appt-input").addEventListener("change", ev => {
+  if (ev.target.value && ev.target.value >= TODAY) { appt = ev.target.value; renderAppt(); renderPdf(); }
+});
+
+/* New entry dialog: one entry at a time, draft kept if closed */
+const dlg = $("entry-dlg"), food = $("q-food"), sym = $("q-sym");
+{ const n = new Date(), hm = String(n.getHours()).padStart(2, "0") + ":" + String(n.getMinutes()).padStart(2, "0");
+  $("q-time").defaultValue = hm; $("q-time").value = hm; }
+const hasDraft = () => food.value.trim() || sym.value.trim();
+function clearError() {
+  $("q-error").hidden = true;
+  [food, sym].forEach(f => f.removeAttribute("aria-invalid"));
+}
+function closeEntry() {
+  if (!dlg.open) return;
+  dlg.close();
+}
+dlg.addEventListener("close", () => {
+  $("new-entry").focus();
+  if (hasDraft()) toast("Draft kept. Open New entry to finish it.");
+});
+$("new-entry").addEventListener("click", () => {
+  clearError();
+  dlg.showModal();
+  food.focus();
+});
+$("dlg-close").addEventListener("click", closeEntry);
+$("q-cancel").addEventListener("click", closeEntry);
+dlg.addEventListener("click", ev => { if (ev.target === dlg) closeEntry(); });
+[food, sym].forEach(f => f.addEventListener("input", () => { if (hasDraft()) clearError(); }));
+$("q-ctx").addEventListener("click", ev => {
+  const b = ev.target.closest(".chip-btn");
+  if (b) b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true"));
+});
+$("quick").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const f = food.value.trim(), sy = sym.value.trim();
+  if (!f && !sy) {
+    $("q-error").hidden = false;
+    [food, sym].forEach(x => x.setAttribute("aria-invalid", "true"));
+    food.focus();
+    return;
+  }
+  const sev = document.querySelector('input[name="sev"]:checked');
+  const date = $("q-date").value && $("q-date").value <= TODAY ? $("q-date").value : TODAY;
+  entries.push({
+    id: "n" + (++added), date, time: $("q-time").value || "12:00", food: f,
+    sym: sy, sev: sy && sev ? sev.value : "",
+    ctx: [...document.querySelectorAll("#q-ctx .chip-btn")].filter(b => b.getAttribute("aria-pressed") === "true").map(b => b.textContent),
+    flagged: false, included: true
+  });
+  ev.target.reset();
+  document.querySelectorAll("#q-ctx .chip-btn").forEach(b => b.setAttribute("aria-pressed", "false"));
+  $("q-sev").open = false;
+  renderAll();
+  dlg.close();
+  toast(date === TODAY ? "Entry saved to today." : `Entry saved to ${fmt(date, { weekday: "long", day: "numeric", month: "long" })}.`);
+});
+
+/* Questions: edit in place, add up to four */
+$("q-add").addEventListener("click", () => {
+  const list = $("qs");
+  const i = list.children.length;
+  const li = document.createElement("li");
+  li.innerHTML = `<textarea class="q-input" id="qe-${i}" rows="1" aria-label="Question ${i + 1}"></textarea>`;
+  list.appendChild(li);
+  li.querySelector("textarea").focus();
+  if (list.children.length >= 4) $("q-add").disabled = true;
+});
+
+/* Grow question fields with their text (fallback where field-sizing is unsupported) */
+function fit(t) { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
+$("qs").addEventListener("input", ev => { if (ev.target.matches(".q-input")) { fit(ev.target); renderPdf(); } });
+if (!CSS.supports("field-sizing", "content")) {
+  document.querySelectorAll(".q-input").forEach(fit);
+  addEventListener("resize", () => document.querySelectorAll(".q-input").forEach(fit));
+}
+
+/* Export: only after Worth flagging has been on screen */
+function unlockExport() {
+  $("export").disabled = false;
+  $("export-hint").hidden = true;
+  $("pdf-toggle").hidden = false;
+}
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver(items => {
+    if (items.some(i => i.isIntersecting)) { unlockExport(); io.disconnect(); }
+  });
+  io.observe($("flags-end"));
+} else unlockExport();
+$("export").addEventListener("click", () => toast("PDF export isn't part of this preview."));
+$("pdf-toggle").addEventListener("click", ev => {
+  const t = ev.currentTarget, open = t.getAttribute("aria-expanded") !== "true";
+  t.setAttribute("aria-expanded", String(open));
+  t.querySelector(".pdf-toggle-t").textContent = open ? "Hide PDF preview" : "Show PDF preview";
+  $("pdf-body").hidden = !open;
+});
+
+renderAll();
+</script>
