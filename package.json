@@ -1,0 +1,45 @@
+{
+  "name": "steady",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "npm run start --workspace server",
+    "check-types": "turbo check-types && tsc -p e2e",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "test": "npm run test --workspace server && npm run test --workspace web && node --test \"scripts/*.test.mjs\"",
+    "e2e": "playwright test",
+    "audit": "npm audit --audit-level=high",
+    "check:tone": "node scripts/check-tone.mjs apps/web/src apps/server/src packages/auth/src",
+    "db:start": "npm run db:start --workspace @steady/db",
+    "db:stop": "npm run db:stop --workspace @steady/db",
+    "db:generate": "npm run db:generate --workspace @steady/db",
+    "db:migrate": "npm run db:migrate --workspace @steady/db",
+    "db:seed": "npm run seed --workspace server",
+    "db:studio": "npm run db:studio --workspace @steady/db",
+    "ci": "npm run format:check && npm run lint && npm run check-types && npm run check:tone && npm test && npm run build && npm run audit && npm run e2e"
+  },
+  "devDependencies": {
+    "@steady/config": "*",
+    "@types/node": "^26.2.0",
+    "turbo": "2.10.11",
+    "typescript": "^6.0.3",
+    "@playwright/test": "^1.62.1",
+    "@biomejs/biome": "^2.5.14"
+  },
+  "overrides": {
+    "@vitejs/devtools": "0.4.1",
+    "kysely": "0.28.17",
+    "@esbuild-kit/core-utils": {
+      "esbuild": "^0.25.12"
+    }
+  },
+  "packageManager": "npm@11.13.0"
+}

@@ -71,11 +71,15 @@ Each one has an automated check (section 10), because a regression here is a saf
 
 - Sign up and sign in with email and password through Better-Auth.
   Sessions are stored in Steady's own Postgres.
+- Sign-up asks for a name, shown on summaries the user exports, so a doctor knows whose summary it is.
+- The web app and the API share one origin, so the session cookie is first-party (`SameSite=Lax`) and there is no CORS.
 - **[Default]** Users must confirm they are 18 or older at sign-up.
   Eating-disorder screening and referral for minors is a different clinical path, which the MVP does not cover.
 - Email verification and password reset use a transactional email provider.
   Those emails never contain health data, only account links.
-- Sign-in is rate limited.
+  Both are deferred until deploy, when the provider is chosen.
+- Sign-in and sign-up are rate limited to 3 attempts per 10 seconds per IP, in every environment.
+  In production, the host's proxy must set `x-forwarded-for`, and `advanced.ipAddress.trustedProxies` must list it, or every user shares one limit.
 
 **Acceptance criteria**
 - A signed-out request to any API route except auth returns 401.
@@ -277,7 +281,8 @@ Deleting the account deletes every row above for that user in one transaction.
 - No third-party scripts, and fonts are self-hosted instead of loaded from Google Fonts, so no third party learns who uses a health app.
   A Content Security Policy blocks all other origins.
 - Logs never include request bodies, journal text, screener answers, or summary content.
-- **Export:** one button downloads all of the user's data as JSON: entries, summaries, screener results, diet plan, and referral log.
+- **Export:** one button downloads all of the user's data as JSON: profile, entries, summaries, screener results, diet plan, and referral log.
+  It never includes the password hash or sign-in tokens (`account`, `session`).
 - **Deletion:** one button, with a typed confirmation, deletes the account and all data immediately.
   **[Default]** Database backups roll off within 30 days, and the deletion screen says so.
 - Nothing goes to a third party, including a doctor, without the user's explicit action each time.
@@ -313,18 +318,20 @@ Deleting the account deletes every row above for that user in one transaction.
 
 ## 8. Tech stack
 
-From the stack map, scaffolded with `bun create better-fullstack@latest`.
+From the stack map, scaffolded with `npx create-better-fullstack@latest` (the exact command is in `README.md`).
 
 | Layer | Choice |
 |---|---|
+| Runtime | Node + npm, with Turborepo for the workspace |
 | Frontend | React + TanStack Router |
 | UI behavior | React Aria Components, styled with the design brief's tokens |
 | API | Hono |
 | ORM and migrations | Drizzle |
 | Database | Postgres |
 | Auth | Better-Auth |
-| PDF | **[Default]** `@react-pdf/renderer`, run on the server from the reviewed snapshot. Confirm it runs under Bun in milestone 0, and pick another server-side library if not. |
-| Tests | Unit tests with the scaffold's runner, end-to-end tests with Playwright |
+| PDF | **[Default]** `@react-pdf/renderer`, run on the server from the reviewed snapshot |
+| Lint and format | Biome, with its accessibility, security, and promise rules on |
+| Tests | Vitest for unit tests, Playwright for end-to-end tests in Chrome, Firefox, Safari, and iPhone Safari |
 
 ## 9. Milestones
 
@@ -352,7 +359,7 @@ Steady-specific checks, one per safety rule, never skipped:
 | Bundle scan: no diet content in frontend JavaScript | Non-negotiable 1 |
 | Tone check: fails on banned words in UI strings and generated text ("eating disorder", "diagnosis", "you have", "safe food", "trigger", "streak", "points", "calorie", "caused") | Non-negotiables 2 and 3 |
 | Export test: export without review returns 409 | Non-negotiable 4 |
-| Origin check: the production build loads no third-party origins | Non-negotiable 5 |
+| Origin check: every Playwright test fails on a request to another origin or a CSP violation (`e2e/fixtures.ts`) | Non-negotiable 5 |
 | Ownership test: one user cannot read another user's rows | Privacy |
 
 ## 11. Phase 2 (not in the MVP)
@@ -377,4 +384,3 @@ Steady-specific checks, one per safety rule, never skipped:
 | Who writes the diet and reintroduction content? | Shipping the diet plan | Dietitian |
 | Which resources, and which crisis line, go in the referral list? | Shipping the referral flow | Clinical advisor |
 | Which host and data region? | Milestone 0 deploy | Bianca |
-| Does `@react-pdf/renderer` run under Bun? | Milestone 2 | Engineering, checked in milestone 0 |
