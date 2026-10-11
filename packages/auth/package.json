@@ -1,0 +1,26 @@
+{
+  "name": "@steady/auth",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@steady/db": "*",
+    "@steady/env": "*",
+    "better-auth": "1.6.22"
+  },
+  "devDependencies": {
+    "@steady/config": "*",
+    "typescript": "^6.0.3"
+  }
+}

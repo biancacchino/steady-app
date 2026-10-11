@@ -1,0 +1,9 @@
+/* React Aria's press handling adds this exact rule as an inline <style> tag, which the
+   Content Security Policy blocks. It skips adding its own when an element with the id
+   "react-aria-pressable-style" exists, so index.html links this file with that id.
+   Copied from react-aria/dist/private/interactions/usePress.mjs; re-check it when upgrading. */
+@layer {
+  [data-react-aria-pressable] {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+}

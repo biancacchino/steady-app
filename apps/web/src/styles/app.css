@@ -1,0 +1,243 @@
+/* Base and controls, following docs/design-brief.md. Colors come only from tokens.css. */
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  /* biome-ignore lint/complexity/noImportantStyles: the hidden attribute must win over any display rule */
+  display: none !important;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background:
+    var(--grain) 0 0 / 180px 180px,
+    var(--bg);
+  color: var(--ink);
+  font: 400 16px / 1.6 var(--sans);
+  padding: 0 16px;
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1 {
+  font: 400 clamp(36px, 7vw, 48px) / 1.05 var(--display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+a {
+  color: var(--primary);
+  text-underline-offset: 3px;
+}
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Layout */
+.site-head {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-block: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.wordmark {
+  font: 400 26px / 1 var(--display);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-block: 32px 64px;
+  display: grid;
+  gap: 24px;
+}
+.auth {
+  max-width: 420px;
+}
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sheet);
+  padding: 32px 24px;
+  display: grid;
+  gap: 12px;
+}
+
+/* Buttons: 44px tall targets */
+.btn {
+  font: 500 15px / 1 var(--sans);
+  border-radius: var(--r-pill);
+  min-height: 44px;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease),
+    transform 150ms var(--ease);
+}
+.btn[data-pressed] {
+  transform: translateY(1px);
+}
+.btn[data-disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.btn-primary[data-hovered]:not([data-disabled]) {
+  background: color-mix(in srgb, var(--primary) 88%, var(--ink));
+}
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.btn-secondary[data-hovered] {
+  border-color: var(--muted);
+}
+.btn-sm {
+  min-height: 44px;
+  padding: 9px 16px;
+  font-size: 14px;
+}
+
+/* Fields */
+.form {
+  display: grid;
+  gap: 20px;
+}
+.field {
+  display: grid;
+  gap: 6px;
+}
+.field .label {
+  font: 500 14px / 1.4 var(--sans);
+}
+.field .hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+.input {
+  font: 400 16px / 1.4 var(--sans);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 10px 12px;
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  transition: border-color 150ms var(--ease);
+}
+.input[data-hovered] {
+  border-color: var(--muted);
+}
+.input[data-invalid] {
+  border-color: var(--ink);
+  border-width: 2px;
+  padding: 9px 11px;
+}
+.field-error {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  font: 500 13px / 1.4 var(--sans);
+  color: var(--ink);
+}
+.field-error svg,
+.form-error svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 1px;
+}
+
+/* Checkbox: the whole row is the target */
+.check {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.check .box {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border: 1.5px solid var(--muted);
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  transition:
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease);
+}
+.check .box svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--on-primary);
+  opacity: 0;
+}
+.check[data-selected] .box {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.check[data-selected] .box svg {
+  opacity: 1;
+}
+.check[data-focus-visible] .box {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.check[data-invalid] .box {
+  border-color: var(--ink);
+  border-width: 2px;
+}
+
+/* Form-level error: icon and text, never color alone */
+.form-error {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-card);
+  padding: 10px 12px;
+  font: 500 14px / 1.5 var(--sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override every component */
+    transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override every component */
+    animation: none !important;
+  }
+}

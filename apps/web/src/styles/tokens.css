@@ -1,0 +1,52 @@
+/* Copied from design/steady-design.html, the source of truth. Change values there first.
+   Only change: "Newsreader Variable" added first, the name the self-hosted font registers. */
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-warm: #f0eee9;
+  --ink: #212121;
+  --muted: #6b6b80;
+  --line: #e4e2dc;
+  --primary: #39594d;
+  --on-primary: #ffffff;
+  --primary-soft: #e3ebe7;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.13 0 0 0 0 0.13 0 0 0 0 0.13 0.06 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+  --paper: #ffffff;
+  --paper-ink: #212121;
+  --paper-muted: #6b6b80;
+  --paper-line: #e4e2dc;
+  --display: "Newsreader Variable", "Newsreader", Georgia, "Times New Roman", serif;
+  --sans: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --r-card: 8px;
+  --r-sheet: 16px;
+  --r-pill: 9999px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16242a;
+    --surface: #1c2d34;
+    --surface-warm: #1f3036;
+    --ink: #fafafa;
+    --muted: #97a3a6;
+    --line: rgb(255 255 255 / 0.12);
+    --primary: #8fbe8e;
+    --on-primary: #16242a;
+    --primary-soft: #233a31;
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.07 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #16242a;
+  --surface: #1c2d34;
+  --surface-warm: #1f3036;
+  --ink: #fafafa;
+  --muted: #97a3a6;
+  --line: rgb(255 255 255 / 0.12);
+  --primary: #8fbe8e;
+  --on-primary: #16242a;
+  --primary-soft: #233a31;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.07 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}

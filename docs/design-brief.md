@@ -277,7 +277,9 @@ A styled kit like shadcn/ui's defaults would pull the app toward the generic loo
 | Screener answers | `RadioGroup` |
 | Summary date range | `DateRangePicker` |
 
-Not yet confirmed: whether Better Fullstack's scaffold offers a UI library option, or whether React Aria gets added by hand after scaffolding.
+Better Fullstack has a React Aria option, but the files it generated used `@base-ui/react` with Tailwind classes and no Tailwind installed.
+Those were deleted, and the components in `apps/web/src/components` are written by hand on `react-aria-components`, styled only from `apps/web/src/styles/tokens.css`.
+The Content Security Policy blocks inline styles, so React Aria's one injected rule is shipped as a file instead (`apps/web/public/react-aria.css`).
 
 ## 8. Open items
 
