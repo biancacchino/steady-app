@@ -92,7 +92,7 @@ Each one has an automated check (section 10), because a regression here is a saf
 
 | Field | Type | Rules |
 |---|---|---|
-| `occurred_at` | timestamp | Defaults to now. The user can change the date and time, so a missed entry can be logged later. |
+| `occurred_at` | timestamp | Defaults to now. The user can change the date and time, so a missed entry can be logged later. Not more than a day ahead: the journal cannot open future weeks, so a later entry could never be seen. |
 | `created_at` | timestamp | Set automatically, never editable. This is the spec's "automatic timestamp". |
 | `food` | text, up to 1000 characters | Optional. |
 | `symptom` | text, up to 1000 characters | Optional. |

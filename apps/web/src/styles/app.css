@@ -241,3 +241,272 @@ a {
     animation: none !important;
   }
 }
+.site-error {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Journal: week header, week strip, and day-grouped entries (design/steady-design.html) */
+.journal {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sheet);
+  overflow: clip;
+}
+.journal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 0;
+}
+.journal-head h1 {
+  font: 400 28px / 1.1 var(--display);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease);
+}
+.chevron {
+  width: 16px;
+  height: 16px;
+}
+.chevron path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn[data-hovered]:not([data-disabled]) {
+  border-color: var(--muted);
+  background: var(--primary-soft);
+}
+.icon-btn[data-disabled] {
+  color: var(--muted);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.journal-obs {
+  padding: 6px 24px 0;
+  max-width: 62ch;
+}
+.week {
+  list-style: none;
+  margin: 0;
+  padding: 14px 12px 18px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+}
+.wd {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  border-radius: var(--r-card);
+}
+button.wd {
+  cursor: pointer;
+}
+.wd[data-focus-visible] {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.wd-d {
+  font: 500 13px / 1 var(--sans);
+  color: var(--muted);
+}
+.wd-n {
+  font: 400 20px / 1 var(--display);
+  font-variant-numeric: tabular-nums;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: background-color 150ms var(--ease);
+}
+.wd[data-hovered] .wd-n {
+  background: var(--primary-soft);
+}
+.wd[aria-current="date"] .wd-n {
+  box-shadow: inset 0 0 0 1.5px var(--primary);
+}
+.wd-m {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  display: grid;
+  place-items: center;
+}
+.wd-m::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px solid var(--line);
+}
+.week li:first-child .wd-m::before {
+  left: 50%;
+}
+.week li:last-child .wd-m::before {
+  right: 50%;
+}
+.wd-m i {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid var(--muted);
+}
+.wd-m i.on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.wd-w {
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--muted);
+  min-height: 1.2em;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.day-group {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  scroll-margin-top: 16px;
+}
+.day-group + .day-group {
+  border-top: 1px solid var(--line);
+}
+.day-date {
+  margin: 0;
+  font: inherit;
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  display: grid;
+  gap: 2px;
+  padding: 18px 0 18px 24px;
+}
+.dd-w {
+  font: 500 13px / 1.3 var(--sans);
+  color: var(--muted);
+}
+.dd-n {
+  font: 400 32px / 1 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+.dd-m {
+  font: 400 13px / 1.3 var(--sans);
+  color: var(--muted);
+}
+.day-entries {
+  display: grid;
+  min-width: 0;
+}
+.entry {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px 24px 18px 12px;
+}
+/* Entries in one day: a shorter, inset hairline, so a new day stays obvious. Only the line is
+   inset; the entry's columns stay aligned with the entry above. */
+.entry + .entry {
+  position: relative;
+}
+.entry + .entry::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 0;
+  border-top: 1px solid var(--line);
+}
+.entry-time {
+  font: 400 14px / 1.7 var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+/* Food / Symptoms / Context: the same three rows on every entry */
+.fields {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 6px 16px;
+  align-items: baseline;
+  margin: 0;
+  min-width: 0;
+}
+.fields .k {
+  font: 400 14px / 1.6 var(--sans);
+  color: var(--muted);
+}
+.fields .v {
+  margin: 0;
+  max-width: 60ch;
+  overflow-wrap: anywhere;
+}
+.fields .none,
+.sev-note {
+  color: var(--muted);
+}
+/* The dot stays with "Severity" when the line wraps. */
+.sev-note {
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .journal-head {
+    padding: 16px 16px 0;
+  }
+  .journal-head h1 {
+    font-size: 24px;
+  }
+  .journal-obs {
+    padding: 6px 16px 0;
+  }
+  .week {
+    padding-inline: 4px;
+  }
+  .day-group {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+  .day-date {
+    padding-left: 16px;
+  }
+  .dd-n {
+    font-size: 28px;
+  }
+  .entry {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 18px 16px 18px 4px;
+  }
+  .fields {
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 4px 12px;
+  }
+  .fields .k {
+    font-size: 13px;
+  }
+}

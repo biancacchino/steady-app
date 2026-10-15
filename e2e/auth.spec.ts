@@ -10,7 +10,7 @@ test("signing up opens the journal", async ({ page, ip: _ }) => {
   await page.getByRole("button", { name: "Create account" }).click();
 
   await expect(page).toHaveURL(/\/journal$/);
-  await expect(page.getByRole("heading", { name: "Your journal" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page).toHaveTitle("Journal - Steady");
 });
 
