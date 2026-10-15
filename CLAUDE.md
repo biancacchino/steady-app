@@ -52,3 +52,4 @@ Biome for lint and format, Vitest, Playwright.
 - Every API route except `/api/auth/*` requires a session. Every query on user data must filter by the session's user id.
 - Server logs hold method, path, and status only. Never log an error object: database errors include the query's values, which can be journal text.
 - Environment variables are declared and validated in `packages/env/src/server.ts`.
+- Commit messages and PRs carry no AI attribution: no "Generated with Claude Code" line and no `Co-Authored-By: Claude` trailer.
