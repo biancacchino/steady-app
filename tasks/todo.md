@@ -15,7 +15,7 @@ Branch: `feat/journal`.
   Verify: unit test with known entries checks the exact sentences (PRD 5.3 acceptance).
 - [x] 5. Week view: month title, previous and next week (next disabled on the current week), week strip, agenda layout with a date column and time column, same Food, Symptoms, Context rows with "None noted".
   Verify: Playwright test and a screenshot pass at phone and desktop widths.
-- [ ] 6. New entry card in a native `<dialog>`: modal on desktop, bottom sheet on phones, fields in PRD order, "Add severity", When defaults to now, draft kept in `localStorage` when closed without saving.
+- [x] 6. New entry card in a native `<dialog>`: modal on desktop, bottom sheet on phones, fields in PRD order, "Add severity", When defaults to now, draft kept in `localStorage` when closed without saving.
   Same card edits an existing entry.
   Verify: Playwright test for the empty-entry message, saving, editing, draft surviving close and reopen, Esc closes, focus returns to the button.
   The origin and CSP check in `e2e/fixtures.ts` must stay green, which proves no inline style was injected.
@@ -23,7 +23,7 @@ Branch: `feat/journal`.
   Verify: Playwright test flags, reloads, sees it kept; deletes, undoes, sees it back.
 - [ ] 8. Accessibility and tone: keyboard-only run through the whole journal, 44px targets, reduced motion, `npm run check:tone` green.
   Verify: manual keyboard pass and a VoiceOver pass on macOS, notes in the PR.
-- [ ] 9. Docs: README, CLAUDE.md (remove the `Modal` warning, note the `<dialog>` choice), PRD only if something changed.
+- [ ] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
 - [ ] 10. `/ship-wise`, then stage and draft the commit for approval.
 
 ## Defaults I picked (say if you want them changed)

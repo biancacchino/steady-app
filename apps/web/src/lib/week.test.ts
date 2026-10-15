@@ -11,6 +11,8 @@ import {
   weekFromSearch,
   weekRange,
   weekTitle,
+  zonedParts,
+  zonedToUtc,
 } from "./week";
 
 describe("mondayOf", () => {
@@ -63,11 +65,12 @@ describe("entryDay and entryTime", () => {
 
   it("uses the zone the entry was logged in", () => {
     expect(entryDay(entry)).toBe("2026-10-12");
-    expect(entryTime(entry, "America/Toronto")).toBe("12:30");
+    expect(entryTime(entry, "America/Toronto", "en-GB")).toBe("12:30");
+    expect(entryTime(entry, "America/Toronto", "en-US")).toBe("12:30 PM");
   });
 
   it("names the entry's zone when the viewer is somewhere else", () => {
-    expect(entryTime(entry, "America/Vancouver")).toBe("12:30 EDT");
+    expect(entryTime(entry, "America/Vancouver", "en-GB")).toBe("12:30 EDT");
   });
 });
 
@@ -100,5 +103,25 @@ describe("groupByDay", () => {
     const morning = { occurredAt: "2026-10-12T12:00:00.000Z", timeZone: "America/Toronto" };
     const evening = { occurredAt: "2026-10-12T23:00:00.000Z", timeZone: "America/Toronto" };
     expect(groupByDay([morning, evening])).toEqual([["2026-10-12", [evening, morning]]]);
+  });
+});
+
+describe("zonedToUtc and zonedParts", () => {
+  it("turns a date and time in a zone into a UTC moment, across daylight saving", () => {
+    expect(zonedToUtc("2026-10-12", "12:30", "America/Toronto")).toBe("2026-10-12T16:30:00.000Z");
+    // Toronto leaves daylight time on 1 November, so the offset changes from -4 to -5.
+    expect(zonedToUtc("2026-11-03", "12:30", "America/Toronto")).toBe("2026-11-03T17:30:00.000Z");
+    expect(zonedToUtc("2026-10-12", "00:15", "Asia/Kolkata")).toBe("2026-10-11T18:45:00.000Z");
+  });
+
+  it("reads a moment back as the date and time in its zone", () => {
+    expect(zonedParts("2026-10-12T16:30:00.000Z", "America/Toronto")).toEqual({
+      date: "2026-10-12",
+      time: "12:30",
+    });
+    expect(zonedParts("2026-10-12T16:30:00.000Z", "America/Vancouver")).toEqual({
+      date: "2026-10-12",
+      time: "09:30",
+    });
   });
 });

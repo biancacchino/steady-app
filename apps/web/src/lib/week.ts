@@ -83,13 +83,22 @@ const clock = (moment: Date, timeZone: string) =>
   }).format(moment);
 
 /**
- * The entry's time where it was logged (decision 3). When the viewer's clock would read
- * differently, the zone's short name follows: lunch in Toronto reads "12:30 EDT" in Vancouver.
+ * The entry's time where it was logged (decision 3), in the browser's own 12- or 24-hour style,
+ * matching the card's native time field. When the viewer's clock would read differently, the
+ * zone's short name follows: lunch in Toronto reads "12:30 PM EDT" in Vancouver.
  */
-export function entryTime({ occurredAt, timeZone }: Timed, viewerZone: string): string {
+export function entryTime(
+  { occurredAt, timeZone }: Timed,
+  viewerZone: string,
+  locale?: string,
+): string {
   const moment = new Date(occurredAt);
-  const time = clock(moment, timeZone);
-  if (time === clock(moment, viewerZone)) return time;
+  const shown = (zone: string) =>
+    new Intl.DateTimeFormat(locale, { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(
+      moment,
+    );
+  const time = shown(timeZone);
+  if (time === shown(viewerZone)) return time;
   const zone = new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "short" })
     .formatToParts(moment)
     .find((part) => part.type === "timeZoneName")?.value;
@@ -121,4 +130,48 @@ export function groupByDay<T extends Timed>(entries: T[]): [string, T[]][] {
   return [...byDay]
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([day, dayEntries]) => [day, dayEntries.sort(newest)]);
+}
+
+/** How far the zone's clock is ahead of UTC at a moment, in milliseconds. */
+function offsetAt(zone: string, ms: number): number {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: zone,
+      hourCycle: "h23",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+      .formatToParts(ms)
+      .map((part) => [part.type, Number(part.value)]),
+  );
+  const wall = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+  );
+  return wall - Math.floor(ms / 1000) * 1000;
+}
+
+/**
+ * The UTC moment for a date and time on the zone's clock, so an edit keeps the entry's own zone
+ * (decision 3). The second pass corrects the offset when the guess lands across a daylight
+ * saving change.
+ */
+export function zonedToUtc(date: string, time: string, zone: string): string {
+  const wall = Date.parse(`${date}T${time}:00Z`);
+  const guess = wall - offsetAt(zone, wall);
+  return new Date(wall - offsetAt(zone, guess)).toISOString();
+}
+
+/** A moment as the date and time on the zone's clock, for the card's Date and Time fields. */
+export function zonedParts(occurredAt: string, zone: string): { date: string; time: string } {
+  const entry = { occurredAt, timeZone: zone };
+  return { date: entryDay(entry), time: clock(new Date(occurredAt), zone) };
 }

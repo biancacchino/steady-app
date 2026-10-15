@@ -426,16 +426,15 @@ button.wd {
   min-width: 0;
 }
 .entry {
+  position: relative;
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
+  /* Wide enough for a 12-hour time ("12:30 PM"); a zone name wraps under it. */
+  grid-template-columns: 72px minmax(0, 1fr);
   gap: 16px;
   padding: 18px 24px 18px 12px;
 }
 /* Entries in one day: a shorter, inset hairline, so a new day stays obvious. Only the line is
    inset; the entry's columns stay aligned with the entry above. */
-.entry + .entry {
-  position: relative;
-}
 .entry + .entry::before {
   content: "";
   position: absolute;
@@ -475,12 +474,218 @@ button.wd {
 .sev-note {
   white-space: nowrap;
 }
+/* Journal header button and the stretched Edit button (decision 15) */
+.new-entry {
+  margin-left: auto;
+}
+.entry-edit {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.entry-edit[data-hovered] {
+  background: color-mix(in srgb, var(--primary-soft) 50%, transparent);
+}
+.entry-edit[data-focus-visible] {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+/* New entry card: a native dialog, a sheet from the bottom on phones */
+.entry-dlg {
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sheet);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow:
+    0 16px 48px rgb(0 0 0 / 0.16),
+    0 2px 6px rgb(0 0 0 / 0.08);
+  overflow: hidden;
+}
+.entry-dlg::backdrop {
+  background: rgb(10 16 18 / 0.45);
+}
+.entry-dlg[open] {
+  animation: dlg-in 250ms ease-out;
+}
+@keyframes dlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.entry-form {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+}
+.dlg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px 12px;
+}
+.dlg-head h2 {
+  font: 400 26px / 1.1 var(--display);
+  letter-spacing: -0.02em;
+}
+.dlg-body {
+  display: grid;
+  gap: 20px;
+  padding: 8px 24px 20px;
+  overflow-y: auto;
+}
+.dlg-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--line);
+}
+.textarea {
+  height: auto;
+  min-height: 44px;
+  resize: vertical;
+}
+.card-set {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.card-set legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font: 500 14px / 1.4 var(--sans);
+}
+.chips,
+.sev-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font: 500 14px / 1 var(--sans);
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease),
+    color 150ms var(--ease);
+}
+.chip[data-hovered] {
+  border-color: var(--muted);
+  color: var(--ink);
+}
+.chip[data-selected] {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--ink);
+}
+.chip[data-focus-visible] {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.when {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+.when .field {
+  width: 168px;
+}
+.when .label {
+  font-weight: 400;
+  color: var(--muted);
+}
+.sev summary {
+  cursor: pointer;
+  font: 500 14px / 1.4 var(--sans);
+  color: var(--primary);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  list-style: none;
+  width: fit-content;
+}
+.sev summary::-webkit-details-marker {
+  display: none;
+}
+.sev[open] summary {
+  color: var(--ink);
+}
+
+/* Toast: shown while it has text; role="status" announces it */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+  max-width: calc(100% - 32px);
+  transform: translate(-50%, 8px);
+  opacity: 0;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--bg);
+  font: 500 14px / 1.4 var(--sans);
+  padding: 12px 18px;
+  border-radius: var(--r-pill);
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 0.12),
+    0 1px 2px rgb(0 0 0 / 0.08);
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+.toast:not(:empty) {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 @media (max-width: 480px) {
   .journal-head {
     padding: 16px 16px 0;
   }
   .journal-head h1 {
     font-size: 24px;
+  }
+  .journal-head {
+    flex-wrap: wrap;
+  }
+  .new-entry {
+    flex-basis: 100%;
+    margin: 8px 0 0;
+  }
+  .entry-dlg {
+    width: 100%;
+    max-width: 100%;
+    margin: auto 0 0;
+    border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+    border-bottom: 0;
+    max-height: calc(100dvh - 24px);
+  }
+  .dlg-foot {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .dlg-foot .btn {
+    flex: 1;
   }
   .journal-obs {
     padding: 6px 16px 0;

@@ -289,6 +289,8 @@ Deleting the account deletes every row above for that user in one transaction.
 - No third-party scripts, and fonts are self-hosted instead of loaded from Google Fonts, so no third party learns who uses a health app.
   A Content Security Policy blocks all other origins.
 - Logs never include request bodies, journal text, screener answers, or summary content.
+- An unsaved New entry draft stays in the browser's local storage, keyed by the user's id, and is cleared on save and on sign-out.
+  Anyone with the device and its developer tools could read an unsaved draft; that is the cost of keeping it on the device and not on the server.
 - **Export:** one button downloads all of the user's data as JSON: profile, entries, summaries, screener results, diet plan, and referral log.
   It never includes the password hash or sign-in tokens (`account`, `session`).
 - **Deletion:** one button, with a typed confirmation, deletes the account and all data immediately.

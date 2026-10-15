@@ -37,7 +37,7 @@ Biome for lint and format, Vitest, Playwright.
 
 - **Node, not Bun.** Bun was the first plan; Node was already installed and avoids runtime questions for the PDF library.
 - **One origin.** Vite proxies `/api` in development; the Hono server serves the built app in production. Cookies stay `SameSite=Lax`, and there is no CORS.
-- **Strict CSP, no exceptions.** Nothing loads from other origins, no inline scripts or styles. Fonts are self-hosted. React Aria's one injected style ships as `apps/web/public/react-aria.css`. React Aria `Modal` also injects a style; see `tasks/todo.md` before using it.
+- **Strict CSP, no exceptions.** Nothing loads from other origins, no inline scripts or styles. Fonts are self-hosted. React Aria's one injected style ships as `apps/web/public/react-aria.css`. React Aria `Modal` also injects a style, so the entry card uses a native `<dialog>` instead; do not use `Modal`.
 - **Gates live on the server.** The diet gate (milestone 3) and export review (milestone 2) are enforced in the API; the UI only chooses what to show.
 - **Migrations only.** Schema changes go through `npm run db:generate` and are committed. There is no `db:push`.
 - **No analytics.** None, first-party or third-party.
