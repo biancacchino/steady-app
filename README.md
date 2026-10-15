@@ -6,6 +6,11 @@ What it must do is in `docs/prd.md`.
 How it should look is in `docs/design-brief.md`.
 How the pieces fit is in `design/steady-stack.html`.
 
+## What works today
+
+The journal (milestone 1): log what you ate and any symptoms, see one week at a time with plain observations, edit entries, flag the ones worth raising at an appointment, and delete with Undo.
+The appointment summary (milestone 2) and the screener gate (milestone 3) come next.
+
 ## Run it locally
 
 You need Node 24 and a Docker engine (OrbStack or Docker Desktop).

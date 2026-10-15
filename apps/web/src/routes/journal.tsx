@@ -28,8 +28,9 @@ import {
 
 type Entry = CardEntry & { symptoms: string[] };
 type Week = { entries: Entry[]; observations: string[] };
-// `undo` holds a deleted entry while Undo is offered (PRD 5.2: 10 seconds).
-type Toast = { message: string; undo?: CardEntry };
+// `undo` holds a deleted entry while Undo is offered (PRD 5.2: 10 seconds). `byPointer` is true
+// when Delete was clicked or tapped, rather than pressed with a keyboard or screen reader.
+type Toast = { message: string; undo?: CardEntry; byPointer?: boolean };
 const UNDO_MS = 10_000;
 
 export const Route = createFileRoute("/journal")({
@@ -68,11 +69,22 @@ function Journal() {
   const newEntryButton = useRef<HTMLButtonElement>(null);
   const undoButton = useRef<HTMLButtonElement>(null);
   const restoring = useRef(false);
+  // WCAG 2.2.1: Undo's 10 seconds wait while the pointer is over it, or while it has focus after a
+  // keyboard or screen reader delete, and start again when they leave. Focus moved here after a
+  // click does not count, or a mouse user's Undo would never go away.
+  // ponytail: a mouse user who deletes, then Tabs back to Undo, gets no pause (hover still works).
+  // Telling that Tab apart needs React Aria's input modality, which is not exported.
+  const [undoFocused, setUndoFocused] = useState(false);
+  const [undoHovered, setUndoHovered] = useState(false);
+  const undoInUse = Boolean(toast?.undo) && ((undoFocused && !toast?.byPointer) || undoHovered);
+
+  // A deleted entry's own button is gone, so focus goes to Undo rather than the page body.
+  useEffect(() => {
+    if (toast?.undo) undoButton.current?.focus();
+  }, [toast]);
 
   useEffect(() => {
-    if (!toast) return;
-    // A deleted entry's own button is gone, so focus goes to Undo rather than the page body.
-    if (toast.undo) undoButton.current?.focus();
+    if (!toast || undoInUse) return;
     const timer = setTimeout(
       () => {
         if (document.activeElement === undoButton.current) newEntryButton.current?.focus();
@@ -82,7 +94,7 @@ function Journal() {
       toast.undo ? UNDO_MS : 4000,
     );
     return () => clearTimeout(timer);
-  }, [toast]);
+  }, [toast, undoInUse]);
 
   // After a save, show the week the entry landed in, so it never seems to vanish.
   function showSaved(entry: { occurredAt: string; timeZone: string }) {
@@ -109,7 +121,11 @@ function Journal() {
       showSaved(row);
     } catch {
       // A new toast restarts the 10 seconds, so there is time to try again.
-      setToast({ message: "The entry could not be restored. Try again.", undo: entry });
+      setToast({
+        message: "The entry could not be restored. Try again.",
+        undo: entry,
+        byPointer: toast?.byPointer,
+      });
     } finally {
       restoring.current = false;
     }
@@ -238,8 +254,8 @@ function Journal() {
             if (keptDraft) setToast({ message: "Draft kept on this device." });
           }}
           onSaved={showSaved}
-          onDeleted={(entry) => {
-            setToast({ message: "Entry deleted.", undo: entry });
+          onDeleted={(entry, byPointer) => {
+            setToast({ message: "Entry deleted.", undo: entry, byPointer });
             void router.invalidate();
           }}
         />
@@ -251,6 +267,8 @@ function Journal() {
             ref={undoButton}
             className="toast-undo"
             onPress={() => toast.undo && void undo(toast.undo)}
+            onFocusChange={setUndoFocused}
+            onHoverChange={setUndoHovered}
           >
             Undo
           </Button>

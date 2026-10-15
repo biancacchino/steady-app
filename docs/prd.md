@@ -104,6 +104,7 @@ Each one has an automated check (section 10), because a regression here is a saf
   This lets Maya log a symptom when she has not eaten.
 - The user can edit and delete their entries.
   Delete asks for no confirmation but offers Undo for 10 seconds.
+  The 10 seconds wait while the pointer is over Undo, or while it has focus after a keyboard or screen reader delete, so nobody is timed out of it (WCAG 2.2.1).
 - **Layout** follows `docs/design-brief.md` sections 5 and 6.
   - The journal is a week view grouped by day.
   - A "New entry" button opens one focused card: a modal on desktop, a bottom sheet on phones.

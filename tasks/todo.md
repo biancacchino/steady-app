@@ -24,7 +24,11 @@ Branch: `feat/journal`.
   Done: no server change was needed. Delete lives in the Edit card; focus moves to Undo, then to the restored entry or to New entry when Undo expires.
 - [ ] 8. Accessibility and tone: keyboard-only run through the whole journal, 44px targets, reduced motion, `npm run check:tone` green.
   Verify: manual keyboard pass and a VoiceOver pass on macOS, notes in the PR.
-- [ ] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
+  Done: `e2e/journal-a11y.spec.ts` covers the keyboard run (desktop browsers), 44px targets at desktop and phone widths, and reduced motion; `check:tone` is green.
+  Undo's 10 seconds now pause while it is hovered or keyboard-focused (WCAG 2.2.1, chosen 2026-10-15).
+  Left: the VoiceOver pass on macOS, done by hand.
+- [x] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
+  Done: README "What works today" and `E2E_PORT`; the CLAUDE.md `Modal` note was already right; PRD 5.2 records the Undo pause.
 - [ ] 10. `/ship-wise`, then stage and draft the commit for approval.
 
 ## Defaults I picked (say if you want them changed)

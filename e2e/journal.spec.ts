@@ -305,3 +305,42 @@ test("Undo goes away after 10 seconds, and the delete stays", async ({ page, ip:
   await page.reload();
   await expect(page.locator(".entry")).toHaveCount(0);
 });
+
+test("Undo waits while it has keyboard focus or the pointer is over it", async ({
+  page,
+  ip: _,
+  isMobile,
+}) => {
+  test.skip(isMobile, "Hover and Tab need a desktop pointer and keyboard");
+  await page.clock.install();
+  await signUp(page);
+  await save(page, { occurredAt: "2026-10-05T16:30:00Z", food: "Toast" });
+  await save(page, { occurredAt: "2026-10-05T18:30:00Z", food: "Rice" });
+  await page.goto(weekUrl("2026-10-05"));
+  const undo = page.getByRole("button", { name: "Undo" });
+
+  // Keyboard: Undo keeps its focus as long as it is needed.
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }).focus();
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Delete entry" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(undo).toBeFocused();
+  await page.clock.runFor(30_000);
+  await expect(undo).toBeVisible();
+  // Moving on starts the 10 seconds again.
+  await page.keyboard.press("Shift+Tab");
+  await page.clock.runFor(9_000);
+  await expect(undo).toBeVisible();
+  await page.clock.runFor(1_500);
+  await expect(undo).toHaveCount(0);
+
+  // Pointer: hovering pauses it the same way.
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 2:30 PM" }).click();
+  await page.getByRole("button", { name: "Delete entry" }).click();
+  await undo.hover();
+  await page.clock.runFor(30_000);
+  await expect(undo).toBeVisible();
+  await page.mouse.move(5, 5);
+  await page.clock.runFor(10_500);
+  await expect(undo).toHaveCount(0);
+});
