@@ -187,6 +187,36 @@ describe("entries API", () => {
     ]);
   });
 
+  // Decision 12: a future week cannot be opened, so a future entry could never be seen again.
+  it("refuses a time more than a day ahead, but allows a fast clock", async () => {
+    const hour = 60 * 60 * 1000;
+    const body = { timeZone: "America/Toronto", food: "Toast" };
+    const ahead = (ms: number) => new Date(Date.now() + ms).toISOString();
+    const late = await call(maya, "POST", "/api/entries", {
+      ...body,
+      occurredAt: ahead(25 * hour),
+    });
+    expect(late.status).toBe(400);
+    const fast = await create(maya, { ...body, occurredAt: ahead(5 * 60 * 1000) });
+    const moved = await call(maya, "PATCH", `/api/entries/${fast.id}`, {
+      occurredAt: ahead(48 * hour),
+      timeZone: "America/Toronto",
+    });
+    expect(moved.status).toBe(400);
+  });
+
+  // Decision 13: the week strip shows each day's symptom from these tags.
+  it("tags each listed entry with the symptoms it mentions", async () => {
+    const cookie = await signUp("Tagged");
+    await create(cookie, {
+      symptom: "cramping, no pain, bloated",
+      occurredAt: "2026-10-12T16:00:00Z",
+    });
+    const week = await call(cookie, "GET", listPath("2026-10-12", "2026-10-18"));
+    const [entry] = ((await week.json()) as { entries: { symptoms: string[] }[] }).entries;
+    expect(entry?.symptoms).toEqual(["bloating", "cramping"]);
+  });
+
   it("refuses bad date ranges", async () => {
     for (const query of [
       "",

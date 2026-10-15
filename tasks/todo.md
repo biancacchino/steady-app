@@ -13,17 +13,18 @@ Branch: `feat/journal`.
   Verify: tests for 401 without a session, 400 on empty entry, and the ownership test (user B gets 404 on user A's entry for read, edit, and delete).
 - [x] 4. Observations: a pure function from entries to sentences ("3 of 7 logged days mentioned bloating."), symptom vocabulary only, never food words.
   Verify: unit test with known entries checks the exact sentences (PRD 5.3 acceptance).
-- [ ] 5. Week view: month title, previous and next week (next disabled on the current week), week strip, agenda layout with a date column and time column, same Food, Symptoms, Context rows with "None noted".
+- [x] 5. Week view: month title, previous and next week (next disabled on the current week), week strip, agenda layout with a date column and time column, same Food, Symptoms, Context rows with "None noted".
   Verify: Playwright test and a screenshot pass at phone and desktop widths.
-- [ ] 6. New entry card in a native `<dialog>`: modal on desktop, bottom sheet on phones, fields in PRD order, "Add severity", When defaults to now, draft kept in `localStorage` when closed without saving.
+- [x] 6. New entry card in a native `<dialog>`: modal on desktop, bottom sheet on phones, fields in PRD order, "Add severity", When defaults to now, draft kept in `localStorage` when closed without saving.
   Same card edits an existing entry.
   Verify: Playwright test for the empty-entry message, saving, editing, draft surviving close and reopen, Esc closes, focus returns to the button.
   The origin and CSP check in `e2e/fixtures.ts` must stay green, which proves no inline style was injected.
-- [ ] 7. Flag toggle ("Flag" or "Flagged" with an icon, not color alone) and delete with a 10-second Undo, no confirmation.
+- [x] 7. Flag toggle ("Flag" or "Flagged" with an icon, not color alone) and delete with a 10-second Undo, no confirmation.
   Verify: Playwright test flags, reloads, sees it kept; deletes, undoes, sees it back.
+  Done: no server change was needed. Delete lives in the Edit card; focus moves to Undo, then to the restored entry or to New entry when Undo expires.
 - [ ] 8. Accessibility and tone: keyboard-only run through the whole journal, 44px targets, reduced motion, `npm run check:tone` green.
   Verify: manual keyboard pass and a VoiceOver pass on macOS, notes in the PR.
-- [ ] 9. Docs: README, CLAUDE.md (remove the `Modal` warning, note the `<dialog>` choice), PRD only if something changed.
+- [ ] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
 - [ ] 10. `/ship-wise`, then stage and draft the commit for approval.
 
 ## Defaults I picked (say if you want them changed)
@@ -32,7 +33,8 @@ Branch: `feat/journal`.
   The client sends `from` and `to` as calendar dates, and the API matches each entry's local date in its own stored zone (decision 4 in the vault).
 - Keyword pre-flagging (design brief, "Flagging") waits for milestone 2, where the summary uses it.
   Milestone 1 has only the manual Flag toggle.
-- Delete happens on the server right away; Undo re-creates the entry with the same fields and `created_at`.
+- Delete happens on the server right away; Undo re-creates the entry with the same fields.
+  It gets a new id and `created_at`, because PRD 5.2 says `created_at` is never set by a client (chosen 2026-10-15).
   The other choice, delaying the delete for 10 seconds on the client, loses the delete if the tab closes.
 
 ## Deferred

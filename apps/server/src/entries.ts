@@ -16,7 +16,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import type { Variables } from "./app";
-import { observe } from "./observations";
+import { observe, symptomsIn } from "./observations";
 
 const EMPTY = "This entry is empty. Add what you ate, a symptom, or both.";
 const INVALID = "Some of this entry could not be saved. Check it and try again.";
@@ -24,6 +24,9 @@ const NOT_FOUND = "This entry could not be found.";
 const MAX_RANGE_DAYS = 366;
 // Postgres refuses year 0, which the ISO formats allow, so dates before this are refused up front.
 const EARLIEST = Date.parse("1900-01-01T00:00:00Z");
+// A future week cannot be opened, so an entry far in the future could never be seen again
+// (decision 12). A day of slack covers a phone clock that runs fast.
+const MAX_AHEAD_MS = 24 * 60 * 60 * 1000;
 
 // Database rules the API turns into words (decision 7). Any other database error stays a 500.
 const CONSTRAINT_MESSAGES: Record<string, string> = {
@@ -43,7 +46,7 @@ const fields = {
   occurredAt: z.iso
     .datetime({ offset: true })
     .transform((value) => new Date(value))
-    .refine((date) => date.getTime() >= EARLIEST),
+    .refine((date) => date.getTime() >= EARLIEST && date.getTime() <= Date.now() + MAX_AHEAD_MS),
   // Stored under the name Postgres knows (decision 8); null fails the pipe as not a zone.
   timeZone: z.string().transform(toTimeZone).pipe(z.string()),
   food: freeText,
@@ -106,7 +109,12 @@ export const entries = new Hono<{ Variables: Variables }>()
         ),
       )
       .orderBy(asc(journalEntry.occurredAt));
-    return c.json({ entries: rows, observations: observe(rows) });
+    // Each entry carries its symptoms for the week strip, from the same matcher (decision 13).
+    const tagged = rows.map((row) => ({
+      ...row,
+      symptoms: [...symptomsIn(row.symptom ?? "")].sort(),
+    }));
+    return c.json({ entries: tagged, observations: observe(rows) });
   })
 
   .post("/", async (c) => {

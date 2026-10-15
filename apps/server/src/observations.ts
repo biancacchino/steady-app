@@ -33,7 +33,7 @@ const NEGATIONS = new Set(["no", "not", "without", "didn't"]);
 type Entry = { occurredAt: Date; timeZone: string; symptom: string | null };
 
 /** The symptoms a note mentions, skipping negated ones. */
-function symptomsIn(note: string): Set<string> {
+export function symptomsIn(note: string): Set<string> {
   const found = new Set<string>();
   // Phone keyboards type a curly apostrophe in "didn't".
   let text = note.toLowerCase().replace(/\u2019/g, "'");
