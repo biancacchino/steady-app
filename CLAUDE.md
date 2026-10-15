@@ -4,7 +4,9 @@ An IBS food and symptom journal with an eating-disorder risk gate before diet co
 
 ## Overrides
 
-None of the global rules are relaxed.
+One global rule is changed: PRs are merged with a merge commit, not squashed, so every feature commit stays on `main` to go back to.
+Delete the branch after merging, as before.
+No other global rule is relaxed.
 Health data raises the bar: anything touching screening, export, sharing, or third parties follows `docs/prd.md` sections 4 and 7 exactly.
 
 ## Repo map
