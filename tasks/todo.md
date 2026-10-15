@@ -26,6 +26,7 @@ Branch: `feat/journal`.
   Verify: manual keyboard pass and a VoiceOver pass on macOS, notes in the PR.
   Done: `e2e/journal-a11y.spec.ts` covers the keyboard run (desktop browsers), 44px targets at desktop and phone widths, and reduced motion; `check:tone` is green.
   Undo's 10 seconds now pause while it is hovered or keyboard-focused (WCAG 2.2.1, chosen 2026-10-15).
+  Review fix (decision 23): pending deletes are kept apart from messages, so a Flag or draft message no longer takes Undo away; one Undo restores every entry deleted in the last 10 seconds; a stale hover flag no longer keeps Undo on screen.
   Left: the VoiceOver pass on macOS, done by hand.
 - [x] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
   Done: README "What works today" and `E2E_PORT`; the CLAUDE.md `Modal` note was already right; PRD 5.2 records the Undo pause.

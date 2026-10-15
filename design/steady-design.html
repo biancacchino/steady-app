@@ -242,8 +242,9 @@ legend { padding: 0; margin-bottom: 6px; }
 .empty-note { padding: 18px 24px; color: var(--muted); }
 
 /* toast (Self-Monitoring feedback) */
-.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 10; max-width: calc(100% - 32px); transform: translate(-50%, 8px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); font: 500 14px/1.4 var(--sans); padding: 12px 18px; border-radius: var(--r-pill); box-shadow: 0 8px 24px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08); transition: opacity 200ms ease-out, transform 200ms ease-out; }
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* inset on both sides and centered: with left: 50% alone a fixed box only gets half the screen to grow into */
+.toast { position: fixed; left: 16px; right: 16px; margin-inline: auto; width: fit-content; max-width: 560px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 10; transform: translateY(8px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); font: 500 14px/1.4 var(--sans); padding: 12px 18px; border-radius: var(--r-pill); box-shadow: 0 8px 24px rgb(0 0 0 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08); transition: opacity 200ms ease-out, transform 200ms ease-out; }
+.toast.show { opacity: 1; transform: none; }
 
 /* summary sheet */
 .sheet { background: var(--surface-warm); border: 1px solid var(--line); border-radius: var(--r-sheet); padding: clamp(20px, 5vw, 44px); display: grid; gap: 28px; }

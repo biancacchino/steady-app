@@ -663,11 +663,16 @@ button.wd {
   align-items: center;
   gap: 8px;
   position: fixed;
-  left: 50%;
+  /* Inset on both sides and centered, so it can use the full width. With left: 50% alone, a
+     fixed box only gets half the screen to grow into, and a message wrapped onto four lines. */
+  left: 16px;
+  right: 16px;
+  margin-inline: auto;
+  width: fit-content;
+  max-width: 560px;
   bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
-  max-width: calc(100% - 32px);
-  transform: translate(-50%, 8px);
+  transform: translateY(8px);
   opacity: 0;
   pointer-events: none;
   background: var(--ink);
@@ -687,13 +692,14 @@ button.wd {
 }
 .toast.shown {
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: none;
   pointer-events: auto;
 }
 .toast:has(.toast-undo) {
   padding: 4px 4px 4px 18px;
 }
 .toast-undo {
+  flex: none;
   min-height: 44px;
   padding: 0 16px;
   border: 0;

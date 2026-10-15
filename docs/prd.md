@@ -105,6 +105,8 @@ Each one has an automated check (section 10), because a regression here is a saf
 - The user can edit and delete their entries.
   Delete asks for no confirmation but offers Undo for 10 seconds.
   The 10 seconds wait while the pointer is over Undo, or while it has focus after a keyboard or screen reader delete, so nobody is timed out of it (WCAG 2.2.1).
+  One Undo brings back every entry deleted in the last 10 seconds, and other messages never replace it.
+  After that, the delete is permanent.
 - **Layout** follows `docs/design-brief.md` sections 5 and 6.
   - The journal is a week view grouped by day.
   - A "New entry" button opens one focused card: a modal on desktop, a bottom sheet on phones.
@@ -383,6 +385,10 @@ Steady-specific checks, one per safety rule, never skipped:
   - or when 3 or more entries in 14 days contain "skipped", "didn't eat", or "scared to eat"
   Keyword matching on free text will produce false positives, which is acceptable only because the result is a suggestion.
 - Expiring share links for summaries.
+- **Recently deleted.** Deleted entries kept for a time the user chooses before they are really gone.
+  It guards against accidental deletes, but deleted health data stays on the server until then, which conflicts with "fully deleted".
+  It needs a `deleted_at` column that every query filters on, a scheduled purge on the host, and an "Erase now" path for someone who needs an entry gone immediately.
+  A password lock on the list was considered and rejected: it hides the list on the device but leaves the data on the server.
 - Step-by-step reintroduction tracking.
 - A provider directory or booking.
 

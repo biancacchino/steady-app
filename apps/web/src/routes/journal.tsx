@@ -28,10 +28,14 @@ import {
 
 type Entry = CardEntry & { symptoms: string[] };
 type Week = { entries: Entry[]; observations: string[] };
-// `undo` holds a deleted entry while Undo is offered (PRD 5.2: 10 seconds). `byPointer` is true
-// when Delete was clicked or tapped, rather than pressed with a keyboard or screen reader.
-type Toast = { message: string; undo?: CardEntry; byPointer?: boolean };
+// Entries deleted in the last 10 seconds, all brought back by one Undo (PRD 5.2). Kept apart from
+// messages, so a message never takes Undo away. `byPointer` is true when the latest Delete was
+// clicked or tapped, rather than pressed with a keyboard or screen reader.
+type Deleted = { entries: CardEntry[]; byPointer: boolean };
 const UNDO_MS = 10_000;
+const MESSAGE_MS = 4000;
+const countEntries = (n: number, done: string) =>
+  n === 1 ? `Entry ${done}.` : `${n} entries ${done}.`;
 
 export const Route = createFileRoute("/journal")({
   head: () => ({ meta: [{ title: "Journal - Steady" }] }),
@@ -63,7 +67,9 @@ function Journal() {
   const navigate = useNavigate({ from: "/journal" });
   const router = useRouter();
   const [target, setTarget] = useState<CardTarget | null>(null);
-  const [toast, setToast] = useState<Toast | null>(null);
+  // An object, so the same text shown twice still restarts its 4 seconds.
+  const [message, setMessage] = useState<{ text: string } | null>(null);
+  const [deleted, setDeleted] = useState<Deleted | null>(null);
   // A restored entry has a new id; its Edit button takes focus when it first renders.
   const [focusId, setFocusId] = useState<string | null>(null);
   const newEntryButton = useRef<HTMLButtonElement>(null);
@@ -76,25 +82,38 @@ function Journal() {
   // Telling that Tab apart needs React Aria's input modality, which is not exported.
   const [undoFocused, setUndoFocused] = useState(false);
   const [undoHovered, setUndoHovered] = useState(false);
-  const undoInUse = Boolean(toast?.undo) && ((undoFocused && !toast?.byPointer) || undoHovered);
+  const undoInUse = deleted !== null && ((undoFocused && !deleted.byPointer) || undoHovered);
 
-  // A deleted entry's own button is gone, so focus goes to Undo rather than the page body.
+  // A deleted entry's own button is gone, so each delete moves focus to Undo rather than the page
+  // body. When Undo goes away, React Aria reports neither hover nor focus ending, so both reset here;
+  // a stale hover would keep the next Undo on screen forever.
   useEffect(() => {
-    if (toast?.undo) undoButton.current?.focus();
-  }, [toast]);
+    if (deleted) {
+      undoButton.current?.focus();
+    } else {
+      setUndoFocused(false);
+      setUndoHovered(false);
+    }
+  }, [deleted]);
 
+  // Each delete makes a new `deleted`, which restarts the 10 seconds.
   useEffect(() => {
-    if (!toast || undoInUse) return;
-    const timer = setTimeout(
-      () => {
-        if (document.activeElement === undoButton.current) newEntryButton.current?.focus();
-        setToast(null);
-        setFocusId(null);
-      },
-      toast.undo ? UNDO_MS : 4000,
-    );
+    if (!deleted || undoInUse) return;
+    const timer = setTimeout(() => {
+      if (document.activeElement === undoButton.current) newEntryButton.current?.focus();
+      setDeleted(null);
+    }, UNDO_MS);
     return () => clearTimeout(timer);
-  }, [toast, undoInUse]);
+  }, [deleted, undoInUse]);
+
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => {
+      setMessage(null);
+      setFocusId(null);
+    }, MESSAGE_MS);
+    return () => clearTimeout(timer);
+  }, [message]);
 
   // After a save, show the week the entry landed in, so it never seems to vanish.
   function showSaved(entry: { occurredAt: string; timeZone: string }) {
@@ -102,35 +121,57 @@ function Journal() {
     void router.invalidate();
   }
 
-  // Undo saves the entry again with the same fields. It gets a new id and created_at, because
+  // Undo saves each entry again with the same fields. Each gets a new id and created_at, because
   // created_at is never set by a client (PRD 5.2).
-  async function undo(entry: CardEntry) {
+  async function undo(pending: Deleted) {
     if (restoring.current) return;
     restoring.current = true;
-    const { occurredAt, timeZone, food, symptom, severity, context, flagged } = entry;
-    try {
-      const res = await fetch("/api/entries", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ occurredAt, timeZone, food, symptom, severity, context, flagged }),
-      });
-      if (!res.ok) throw new Error();
-      const row = (await res.json()) as CardEntry;
-      setFocusId(row.id);
-      setToast({ message: "Entry restored." });
-      showSaved(row);
-    } catch {
-      // A new toast restarts the 10 seconds, so there is time to try again.
-      setToast({
-        message: "The entry could not be restored. Try again.",
-        undo: entry,
-        byPointer: toast?.byPointer,
-      });
-    } finally {
-      restoring.current = false;
+    const failed: CardEntry[] = [];
+    let last: CardEntry | null = null;
+    for (const entry of pending.entries) {
+      const { occurredAt, timeZone, food, symptom, severity, context, flagged } = entry;
+      try {
+        const res = await fetch("/api/entries", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ occurredAt, timeZone, food, symptom, severity, context, flagged }),
+        });
+        if (!res.ok) throw new Error();
+        last = (await res.json()) as CardEntry;
+      } catch {
+        failed.push(entry);
+      }
     }
+    restoring.current = false;
+    // Only the entries this Undo handled leave the list: one deleted while it ran keeps its Undo.
+    // Failed ones stay, and the new list restarts the 10 seconds, so there is time to try again.
+    const handled = new Set(pending.entries.map((entry) => entry.id));
+    setDeleted((current) => {
+      const left = [...(current?.entries ?? []).filter((e) => !handled.has(e.id)), ...failed];
+      // `current` is null when the 10 seconds ran out mid-restore; the failed entries keep how
+      // their delete was pressed, so a keyboard user's focus still pauses them.
+      return left.length > 0
+        ? { entries: left, byPointer: current?.byPointer ?? pending.byPointer }
+        : null;
+    });
+    if (failed.length > 0) {
+      const restored = pending.entries.length - failed.length;
+      const notRestored =
+        failed.length === 1
+          ? "1 entry could not be restored. Try again."
+          : `${failed.length} entries could not be restored. Try again.`;
+      // Say what did come back too, so a retry is not mistaken for redoing all of them.
+      setMessage({
+        text: restored > 0 ? `${countEntries(restored, "restored")} ${notRestored}` : notRestored,
+      });
+    } else if (last) {
+      setFocusId(last.id);
+      setMessage({ text: countEntries(pending.entries.length, "restored") });
+    }
+    if (last) showSaved(last);
   }
 
+  const deletedText = deleted ? countEntries(deleted.entries.length, "deleted") : "";
   const viewerZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const isCurrentWeek = week === mondayOf(todayIn());
   const days = Array.from({ length: 7 }, (_, i) => addDays(week, i));
@@ -236,7 +277,7 @@ function Journal() {
                     viewerZone={viewerZone}
                     autoFocus={entry.id === focusId}
                     onEdit={() => setTarget({ mode: "edit", entry })}
-                    onToast={(message) => setToast({ message })}
+                    onToast={(text) => setMessage({ text })}
                   />
                 ))}
               </div>
@@ -251,22 +292,28 @@ function Journal() {
           userId={userId}
           onClose={(keptDraft) => {
             setTarget(null);
-            if (keptDraft) setToast({ message: "Draft kept on this device." });
+            if (keptDraft) setMessage({ text: "Draft kept on this device." });
           }}
           onSaved={showSaved}
           onDeleted={(entry, byPointer) => {
-            setToast({ message: "Entry deleted.", undo: entry, byPointer });
+            setDeleted((current) => ({ entries: [...(current?.entries ?? []), entry], byPointer }));
             void router.invalidate();
           }}
         />
       )}
-      <div className={toast ? "toast shown" : "toast"}>
-        <p role="status">{toast?.message}</p>
-        {toast?.undo && (
+      <div className={deleted || message ? "toast shown" : "toast"}>
+        {/* Two live regions, always mounted: when the message clears, the delete count does not
+            change, so a screen reader does not announce "Entry deleted." a second time. */}
+        <p className="toast-text">
+          <span role="status">{deletedText}</span>
+          {deleted && message && " "}
+          <span role="status">{message?.text}</span>
+        </p>
+        {deleted && (
           <Button
             ref={undoButton}
             className="toast-undo"
-            onPress={() => toast.undo && void undo(toast.undo)}
+            onPress={() => void undo(deleted)}
             onFocusChange={setUndoFocused}
             onHoverChange={setUndoHovered}
           >

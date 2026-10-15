@@ -160,7 +160,7 @@ test("closing keeps a draft for this user, and signing out removes it", async ({
   await page.getByLabel("Symptoms").fill("bad cramps");
   await page.keyboard.press("Escape");
 
-  await expect(page.getByRole("status")).toHaveText("Draft kept on this device.");
+  await expect(page.locator(".toast-text")).toHaveText("Draft kept on this device.");
   await expect(newEntry).toBeFocused();
   await newEntry.click();
   await expect(page.getByLabel("Symptoms")).toHaveValue("bad cramps");
@@ -225,13 +225,13 @@ test("a flag is kept after a reload, and says so in words", async ({ page, ip: _
 
   const flagged = page.getByRole("button", { name: /^Flagged, Monday 5 October/ });
   await expect(flagged).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("status")).toHaveText("Added to your appointment summary.");
+  await expect(page.locator(".toast-text")).toHaveText("Added to your appointment summary.");
   await page.reload();
   await expect(flagged).toHaveAttribute("aria-pressed", "true");
 
   await flagged.click();
   await expect(flag).toHaveAttribute("aria-pressed", "false");
-  await expect(page.getByRole("status")).toHaveText("Removed from your appointment summary.");
+  await expect(page.locator(".toast-text")).toHaveText("Removed from your appointment summary.");
 });
 
 test("delete asks nothing, and Undo brings the entry back", async ({ page, ip: _ }) => {
@@ -250,7 +250,7 @@ test("delete asks nothing, and Undo brings the entry back", async ({ page, ip: _
 
   await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.locator(".entry")).toHaveCount(0);
-  await expect(page.getByRole("status")).toHaveText("Entry deleted.");
+  await expect(page.locator(".toast-text")).toHaveText("Entry deleted.");
   const undo = page.getByRole("button", { name: "Undo" });
   // The entry's own button is gone, so focus goes to Undo instead of the page body.
   await expect(undo).toBeFocused();
@@ -262,7 +262,7 @@ test("delete asks nothing, and Undo brings the entry back", async ({ page, ip: _
   await expect(entry).toContainText("· Severity high");
   await expect(entry).toContainText("Travel");
   await expect(page.getByRole("button", { name: /^Flagged, Monday 5 October/ })).toBeVisible();
-  await expect(page.getByRole("status")).toHaveText("Entry restored.");
+  await expect(page.locator(".toast-text")).toHaveText("Entry restored.");
   await expect(
     page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }),
   ).toBeFocused();
@@ -325,4 +325,92 @@ test("Undo waits while it has keyboard focus or the pointer is over it", async (
   await page.mouse.move(5, 5);
   await page.clock.runFor(10_500);
   await expect(undo).toHaveCount(0);
+});
+
+test("after a mouse Undo, the next Undo still goes away after 10 seconds", async ({
+  page,
+  ip: _,
+  isMobile,
+}) => {
+  test.skip(isMobile, "Needs a desktop pointer");
+  await page.clock.install();
+  await signUp(page);
+  await save(page, { occurredAt: "2026-10-05T16:30:00Z", food: "Toast" });
+  await save(page, { occurredAt: "2026-10-05T18:30:00Z", food: "Rice" });
+  await page.goto(weekUrl("2026-10-05"));
+  const undo = page.getByRole("button", { name: "Undo" });
+
+  // Undo is clicked, so it disappears while the pointer is over it.
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }).click();
+  await page.getByRole("button", { name: "Delete entry" }).click();
+  await undo.click();
+  await expect(page.locator(".toast-text")).toHaveText("Entry restored.");
+
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 2:30 PM" }).click();
+  await page.getByRole("button", { name: "Delete entry" }).click();
+  await expect(undo).toBeVisible();
+  await page.clock.runFor(10_500);
+  await expect(undo).toHaveCount(0);
+});
+
+test("another message does not take Undo away", async ({ page, ip: _ }) => {
+  await signUp(page);
+  await save(page, { occurredAt: "2026-10-05T16:30:00Z", food: "Toast" });
+  await save(page, { occurredAt: "2026-10-05T18:30:00Z", food: "Rice" });
+  await page.goto(weekUrl("2026-10-05"));
+
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }).click();
+  await page.getByRole("button", { name: "Delete entry" }).click();
+  await page.getByRole("button", { name: /^Flag, Monday 5 October 2:30 PM/ }).click();
+  await expect(page.locator(".toast-text")).toHaveText(
+    "Entry deleted. Added to your appointment summary.",
+  );
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect(page.locator(".entry", { hasText: "Toast" })).toHaveCount(1);
+});
+
+test("one Undo brings back every entry deleted in the last 10 seconds", async ({ page, ip: _ }) => {
+  await signUp(page);
+  await save(page, { occurredAt: "2026-10-05T16:30:00Z", food: "Toast" });
+  await save(page, { occurredAt: "2026-10-05T18:30:00Z", food: "Rice" });
+  await page.goto(weekUrl("2026-10-05"));
+
+  for (const time of ["12:30 PM", "2:30 PM"]) {
+    await page.getByRole("button", { name: `Edit entry, Monday 5 October ${time}` }).click();
+    await page.getByRole("button", { name: "Delete entry" }).click();
+  }
+  await expect(page.locator(".entry")).toHaveCount(0);
+  await expect(page.locator(".toast-text")).toHaveText("2 entries deleted.");
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect(page.locator(".entry")).toHaveCount(2);
+  await expect(page.locator(".toast-text")).toHaveText("2 entries restored.");
+});
+
+test("a failed restore keeps Undo, says so, and works on the next try", async ({ page, ip: _ }) => {
+  await signUp(page);
+  await save(page, { occurredAt: "2026-10-05T16:30:00Z", food: "Toast" });
+  await page.goto(weekUrl("2026-10-05"));
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }).click();
+  await page.getByRole("button", { name: "Delete entry" }).click();
+
+  // The first restore fails on the server.
+  let fail = true;
+  await page.route("**/api/entries", async (route) => {
+    if (route.request().method() === "POST" && fail) {
+      fail = false;
+      await route.fulfill({ status: 500, body: "{}" });
+    } else {
+      await route.continue();
+    }
+  });
+  const undo = page.getByRole("button", { name: "Undo" });
+  await undo.click();
+  await expect(page.locator(".toast-text")).toHaveText(
+    "Entry deleted. 1 entry could not be restored. Try again.",
+  );
+  await expect(page.locator(".entry")).toHaveCount(0);
+
+  await undo.click();
+  await expect(page.locator(".toast-text")).toHaveText("Entry restored.");
+  await expect(page.locator(".entry", { hasText: "Toast" })).toHaveCount(1);
 });
