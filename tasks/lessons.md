@@ -15,3 +15,9 @@
   Do not drop field labels and rely on position or a decorative rule to say which line is food and which is a symptom.
   A cue that only shows up on some entries (like a rule only when a symptom exists) makes entries look inconsistent.
   Use the same labeled rows on every entry, with an explicit empty value like "None noted".
+
+## Checks
+
+- Read a check's exit code, not the last lines of its output.
+  Biome prints its errors first and a plain summary last, so `| tail -2` showed a clean-looking summary while 5 `noSecrets` errors went unreported for two steps.
+  Run each check as `cmd >/dev/null 2>&1; echo "exit $?"`, then read the full output only when one fails.

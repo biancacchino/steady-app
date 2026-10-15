@@ -8,6 +8,13 @@
       "when": 1790721779305,
       "tag": "0000_lowly_wasp",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792038090676,
+      "tag": "0001_nosy_forgotten_one",
+      "breakpoints": true
     }
   ]
 }

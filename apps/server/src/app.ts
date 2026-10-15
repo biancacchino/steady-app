@@ -6,7 +6,9 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { secureHeaders } from "hono/secure-headers";
 
-type Variables = { user: typeof auth.$Infer.Session.user };
+import { entries } from "./entries";
+
+export type Variables = { user: typeof auth.$Infer.Session.user };
 
 export const app = new Hono<{ Variables: Variables }>();
 
@@ -52,6 +54,15 @@ app.use("/api/*", async (c, next) => {
   c.set("user", session.user);
   return next();
 });
+
+// Never print the error itself. A database error's message includes the query's values, which can be
+// journal text, and logs hold method, path, and status only.
+app.onError((err, c) => {
+  console.error(`${c.req.method} ${c.req.path} 500 ${err.name}`);
+  return c.json({ error: "Something went wrong. Try again." }, 500);
+});
+
+app.route("/api/entries", entries);
 
 app.get("/api/me", (c) => {
   const { id, email, name } = c.get("user");

@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { format } from "node:util";
+import { describe, expect, it, vi } from "vitest";
 
 import { app } from "./app";
+
+// Registered before any request: Hono refuses new routes once it has routed one.
+app.get("/test-error", () => {
+  throw new Error("Toast and bloating");
+});
 
 describe("server", () => {
   it("rejects signed-out API requests with 401", async () => {
@@ -20,5 +26,15 @@ describe("server", () => {
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).not.toMatch(/https?:\/\//);
+  });
+
+  it("logs a server error without its message, which can hold journal text", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await app.request("/test-error");
+    expect(res.status).toBe(500);
+    expect(await res.text()).not.toContain("Toast");
+    // format() prints an Error the way console.error does; JSON.stringify would show {}.
+    expect(log.mock.calls.map((args) => format(...args)).join("\n")).not.toContain("Toast");
+    log.mockRestore();
   });
 });
