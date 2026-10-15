@@ -15,7 +15,8 @@
     "@steady/auth": "*",
     "@steady/env": "*",
     "better-auth": "1.6.22",
-    "hono": "^4.12.27"
+    "hono": "^4.12.27",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@steady/config": "*",

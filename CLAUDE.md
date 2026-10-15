@@ -10,7 +10,7 @@ Health data raises the bar: anything touching screening, export, sharing, or thi
 ## Repo map
 
 - `apps/web` - React + TanStack Router app. Routes in `src/routes`, React Aria components in `src/components`, tokens in `src/styles/tokens.css`.
-- `apps/server` - Hono server. `src/app.ts` holds middleware, security headers, and routes; `src/index.ts` starts it. In production it also serves `apps/web/dist`.
+- `apps/server` - Hono server. `src/app.ts` holds middleware, security headers, the error handler, and routes; `src/entries.ts` is the journal entries API; `src/index.ts` starts it. In production it also serves `apps/web/dist`.
 - `packages/auth` - Better-Auth config (18+ confirmation, rate limit).
 - `packages/db` - Drizzle schema in `src/schema`, migrations in `src/migrations`, Postgres in `docker-compose.yml`.
 - `packages/env` - Validated server environment variables.
@@ -50,5 +50,6 @@ Biome for lint and format, Vitest, Playwright.
 - Colors come only from tokens. Change values in `design/steady-design.html` first, then copy them.
 - No eyebrows (small labels above or beside headings) and no italic or accent-word headlines. See `tasks/lessons.md`.
 - Every API route except `/api/auth/*` requires a session. Every query on user data must filter by the session's user id.
-- Server logs hold method, path, and status only.
+- Server logs hold method, path, and status only. Never log an error object: database errors include the query's values, which can be journal text.
 - Environment variables are declared and validated in `packages/env/src/server.ts`.
+- Commit messages and PRs carry no AI attribution: no "Generated with Claude Code" line and no `Co-Authored-By: Claude` trailer.

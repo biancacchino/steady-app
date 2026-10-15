@@ -43,14 +43,15 @@ jobs:
         run: npm run check-types
       - name: Tone check (PRD section 10)
         run: npm run check:tone
+      # Unit tests include database tests (constraints, ownership), so the tables must exist first.
+      - name: Apply database migrations
+        run: npm run db:migrate
       - name: Unit tests
         run: npm test
       - name: Production build
         run: npm run build
       - name: Dependency audit (high and critical)
         run: npm run audit
-      - name: Apply database migrations
-        run: npm run db:migrate
       - name: Install browsers
         run: npx playwright install --with-deps chromium firefox webkit
       - name: End-to-end tests
