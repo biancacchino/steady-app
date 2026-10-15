@@ -132,6 +132,14 @@ Each one has an automated check (section 10), because a regression here is a saf
   Recurring words from food notes are left out on purpose.
   Showing "pasta: 4 times" next to symptom counts would read as a ranking of foods, which breaks non-negotiable 3.
 - Observations are sentences, not big numbers: "3 of 7 logged days mentioned bloating."
+- The sentences are worked out on the server, so the journal and the summary always match:
+  - first the count: "You logged 9 entries on 5 days.", or "No entries logged." for an empty range
+  - then symptoms noted on 2 or more logged days, most days first, ties in alphabetical order: "3 of 5 logged days mentioned bloating, 2 mentioned cramping."
+  - no symptom sentence when nothing recurs
+- The vocabulary lists each symptom's word forms ("bloated", "bloating").
+  A symptom word after "no", "not", "without", or "didn't" is not counted, up to the next comma or period.
+  This is a word rule with a known limit: "no pain but bloated" skips "bloated" too.
+- Everyday words count too: "tired" as fatigue, "stomach ache" as pain, "loose stools" as diarrhea.
 - The app never states cause and effect ("you are sensitive to X").
   Co-occurrence only appears as a suggested question for the doctor (section 5.4).
 
@@ -383,4 +391,5 @@ Steady-specific checks, one per safety rule, never skipped:
 | Is a 90-day wait after a positive screen right? | Shipping the gate to real users | Clinical advisor |
 | Who writes the diet and reintroduction content? | Shipping the diet plan | Dietitian |
 | Which resources, and which crisis line, go in the referral list? | Shipping the referral flow | Clinical advisor |
+| Is the symptom vocabulary, including everyday words like "tired", right for counting symptoms? | Shipping observations and the summary to real users | Clinical advisor |
 | Which host and data region? | Milestone 0 deploy | Bianca |

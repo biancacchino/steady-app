@@ -16,6 +16,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import type { Variables } from "./app";
+import { observe } from "./observations";
 
 const EMPTY = "This entry is empty. Add what you ate, a symptom, or both.";
 const INVALID = "Some of this entry could not be saved. Check it and try again.";
@@ -87,7 +88,8 @@ function constraintMessage(error: unknown): string | undefined {
 }
 
 export const entries = new Hono<{ Variables: Variables }>()
-  // Entries whose local date, in the zone they were logged in, falls in the range (decision 4).
+  // Entries whose local date, in the zone they were logged in, falls in the range (decision 4),
+  // with the plain sentences the week view shows above them (decision 10).
   // ponytail: the (user_id, occurred_at) index narrows to one user's rows, then each is checked.
   // Fine for one person's journal; add an index on the local date if this gets slow.
   .get("/", async (c) => {
@@ -104,7 +106,7 @@ export const entries = new Hono<{ Variables: Variables }>()
         ),
       )
       .orderBy(asc(journalEntry.occurredAt));
-    return c.json(rows);
+    return c.json({ entries: rows, observations: observe(rows) });
   })
 
   .post("/", async (c) => {

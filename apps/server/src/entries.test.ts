@@ -40,6 +40,11 @@ function call(cookie: string | null, method: string, path: string, body?: unknow
   });
 }
 
+type Listed = { id: string; food: string | null };
+async function entriesOf(res: Response) {
+  return ((await res.json()) as { entries: Listed[] }).entries;
+}
+
 async function create(cookie: string, fields: Record<string, unknown>) {
   const res = await call(cookie, "POST", "/api/entries", {
     occurredAt: "2026-10-13T16:30:00Z",
@@ -156,8 +161,8 @@ describe("entries API", () => {
     });
     const monday = await call(cookie, "GET", listPath("2026-10-12", "2026-10-12"));
     const tuesday = await call(cookie, "GET", listPath("2026-10-13", "2026-10-13"));
-    expect(await monday.json()).toEqual([]);
-    expect(((await tuesday.json()) as { id: string }[]).map((e) => e.id)).toEqual([snack.id]);
+    expect(await monday.json()).toEqual({ entries: [], observations: ["No entries logged."] });
+    expect((await entriesOf(tuesday)).map((e) => e.id)).toEqual([snack.id]);
   });
 
   // Decision 8: Postgres does not know "Asia/Calcutta", so storing it would break the week list.
@@ -167,7 +172,19 @@ describe("entries API", () => {
     expect(entry.timeZone).toBe("Asia/Kolkata");
     const week = await call(cookie, "GET", listPath("2026-10-12", "2026-10-18"));
     expect(week.status).toBe(200);
-    expect(((await week.json()) as { id: string }[]).map((e) => e.id)).toEqual([entry.id]);
+    expect((await entriesOf(week)).map((e) => e.id)).toEqual([entry.id]);
+  });
+
+  // Decision 10: the week view gets its sentences from the same request as its entries.
+  it("lists the week's observations with its entries", async () => {
+    const cookie = await signUp("Observed");
+    await create(cookie, { symptom: "bloating", occurredAt: "2026-10-12T16:00:00Z" });
+    await create(cookie, { symptom: "no pain, bloated", occurredAt: "2026-10-13T16:00:00Z" });
+    const week = await call(cookie, "GET", listPath("2026-10-12", "2026-10-18"));
+    expect(((await week.json()) as { observations: string[] }).observations).toEqual([
+      "You logged 2 entries on 2 days.",
+      "2 of 2 logged days mentioned bloating.",
+    ]);
   });
 
   it("refuses bad date ranges", async () => {
@@ -197,12 +214,10 @@ describe("entries API", () => {
     expect((await call(sam, "PATCH", path, { food: "Changed" })).status).toBe(404);
     expect((await call(sam, "DELETE", path)).status).toBe(404);
     const list = await call(sam, "GET", listPath("2026-10-01", "2026-10-31"));
-    expect(await list.json()).toEqual([]);
+    expect(await entriesOf(list)).toEqual([]);
 
     const mine = await call(maya, "GET", listPath("2026-10-13", "2026-10-13"));
-    const oatmeal = ((await mine.json()) as { id: string; food: string }[]).find(
-      (e) => e.id === entry.id,
-    );
+    const oatmeal = (await entriesOf(mine)).find((e) => e.id === entry.id);
     expect(oatmeal?.food).toBe("Oatmeal");
   });
 

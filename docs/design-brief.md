@@ -207,7 +207,8 @@ Journal body text keeps a 60-70 character measure.
   The week strip underneath shows the exact days.
   When a week spans two months, the title shows both ("September - October 2026").
   Next is disabled on the current week.
-  Below it, one plain sentence: "This week: 3 of 7 logged days mentioned bloating."
+  Below it, at most two plain sentences: "You logged 9 entries on 5 days. 3 of 5 logged days mentioned bloating, 2 mentioned cramping."
+  They never say "this week", because past weeks and the appointment summary show the same sentences.
 - **Week strip.**
   Sits under the week header.
   Each day shows its short name, its date in the display serif, and a small mark on one shared hairline, Polarity-style.

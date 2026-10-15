@@ -11,7 +11,7 @@ Branch: `feat/journal`.
 - [x] 3. API: `GET /api/entries?from&to` (calendar dates), `POST /api/entries`, `PATCH /api/entries/:id`, `DELETE /api/entries/:id`.
   Validated input, every query filtered by the session's user id, empty-entry error with the PRD's exact message.
   Verify: tests for 401 without a session, 400 on empty entry, and the ownership test (user B gets 404 on user A's entry for read, edit, and delete).
-- [ ] 4. Observations: a pure function from entries to sentences ("3 of 7 logged days mentioned bloating."), symptom vocabulary only, never food words.
+- [x] 4. Observations: a pure function from entries to sentences ("3 of 7 logged days mentioned bloating."), symptom vocabulary only, never food words.
   Verify: unit test with known entries checks the exact sentences (PRD 5.3 acceptance).
 - [ ] 5. Week view: month title, previous and next week (next disabled on the current week), week strip, agenda layout with a date column and time column, same Food, Symptoms, Context rows with "None noted".
   Verify: Playwright test and a screenshot pass at phone and desktop widths.
