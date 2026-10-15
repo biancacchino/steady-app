@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalPassThroughEnv": ["E2E_PORT"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

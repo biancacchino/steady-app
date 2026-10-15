@@ -32,6 +32,7 @@ npm run ci
 This runs everything CI runs, in order: format, lint, type check, tone check, unit tests, production build, dependency audit, and the Playwright tests in Chrome, Firefox, Safari, and iPhone Safari.
 Every Playwright test also fails if the page requests anything from another website or breaks the Content Security Policy.
 The Playwright tests build and start the production server on port 3100 and need Postgres running.
+They never reuse a server already on that port, which may be another worktree's build; set `E2E_PORT` to run them in a second worktree at the same time.
 The unit tests need it too, with migrations applied: some check the database's rules and the entries API against the real tables.
 The first time, install the browsers with `npx playwright install`.
 

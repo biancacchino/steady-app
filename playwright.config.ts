@@ -1,8 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // Tests run against the production build: one Hono server serves the web app and the API,
-// with the real security headers. Port 3100 keeps it apart from `npm run dev`.
-const PORT = 3100;
+// with the real security headers. Port 3100 keeps it apart from `npm run dev`; E2E_PORT lets a
+// second worktree run its tests at the same time.
+const PORT = Number(process.env.E2E_PORT ?? 3100);
 
 export default defineConfig({
   testDir: "./e2e",
@@ -33,7 +34,9 @@ export default defineConfig({
     command: "npm run build && npm start",
     url: `http://localhost:${PORT}/sign-in`,
     timeout: 180_000,
-    reuseExistingServer: !process.env.CI,
+    // Never reuse: a server already on the port may be another worktree's build, and the tests
+    // would pass or fail against code that is not in this checkout.
+    reuseExistingServer: false,
     env: {
       NODE_ENV: "production",
       PORT: String(PORT),
