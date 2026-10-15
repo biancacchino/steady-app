@@ -28,6 +28,7 @@ export type CardEntry = {
   symptom: string | null;
   severity: string | null;
   context: string[];
+  flagged: boolean;
 };
 export type CardTarget = { mode: "new" } | { mode: "edit"; entry: CardEntry };
 
@@ -37,6 +38,8 @@ type Props = {
   /** Called after the dialog closes; `keptDraft` is true when an unsaved new entry was kept. */
   onClose: (keptDraft: boolean) => void;
   onSaved: (entry: CardEntry) => void;
+  /** Called after an edited entry is deleted, with the entry as it was, so it can be undone. */
+  onDeleted: (entry: CardEntry) => void;
 };
 
 /**
@@ -44,7 +47,7 @@ type Props = {
  * behind it inert, closes it on Esc, and returns focus to the button that opened it.
  * React Aria's Modal is not used because it injects an inline style the CSP blocks.
  */
-export function EntryCard({ target, userId, onClose, onSaved }: Props) {
+export function EntryCard({ target, userId, onClose, onSaved, onDeleted }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const food = useRef<HTMLInputElement>(null);
   const saved = useRef(false);
@@ -126,6 +129,26 @@ export function EntryCard({ target, userId, onClose, onSaved }: Props) {
     saved.current = true;
     if (!editing) clearDraft(userId);
     onSaved((await res.json()) as CardEntry);
+    close();
+  }
+
+  // PRD 5.2: no confirmation; the journal offers Undo instead.
+  async function remove(entry: CardEntry) {
+    setError(null);
+    let res: Response;
+    try {
+      res = await fetch(`/api/entries/${entry.id}`, { method: "DELETE" });
+    } catch {
+      setError("Your entry could not be deleted. Check your connection and try again.");
+      return;
+    }
+    if (!res.ok) {
+      const message = ((await res.json().catch(() => null)) as { error?: string } | null)?.error;
+      setError(message ?? "Your entry could not be deleted. Try again.");
+      return;
+    }
+    saved.current = true;
+    onDeleted(entry);
     close();
   }
 
@@ -224,6 +247,11 @@ export function EntryCard({ target, userId, onClose, onSaved }: Props) {
           </details>
         </div>
         <div className="dlg-foot">
+          {editing && (
+            <Button className="btn btn-secondary delete-entry" onPress={() => void remove(editing)}>
+              Delete entry
+            </Button>
+          )}
           <Button className="btn btn-secondary" onPress={close}>
             Cancel
           </Button>

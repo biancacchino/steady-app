@@ -19,8 +19,9 @@ Branch: `feat/journal`.
   Same card edits an existing entry.
   Verify: Playwright test for the empty-entry message, saving, editing, draft surviving close and reopen, Esc closes, focus returns to the button.
   The origin and CSP check in `e2e/fixtures.ts` must stay green, which proves no inline style was injected.
-- [ ] 7. Flag toggle ("Flag" or "Flagged" with an icon, not color alone) and delete with a 10-second Undo, no confirmation.
+- [x] 7. Flag toggle ("Flag" or "Flagged" with an icon, not color alone) and delete with a 10-second Undo, no confirmation.
   Verify: Playwright test flags, reloads, sees it kept; deletes, undoes, sees it back.
+  Done: no server change was needed. Delete lives in the Edit card; focus moves to Undo, then to the restored entry or to New entry when Undo expires.
 - [ ] 8. Accessibility and tone: keyboard-only run through the whole journal, 44px targets, reduced motion, `npm run check:tone` green.
   Verify: manual keyboard pass and a VoiceOver pass on macOS, notes in the PR.
 - [ ] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
@@ -32,7 +33,8 @@ Branch: `feat/journal`.
   The client sends `from` and `to` as calendar dates, and the API matches each entry's local date in its own stored zone (decision 4 in the vault).
 - Keyword pre-flagging (design brief, "Flagging") waits for milestone 2, where the summary uses it.
   Milestone 1 has only the manual Flag toggle.
-- Delete happens on the server right away; Undo re-creates the entry with the same fields and `created_at`.
+- Delete happens on the server right away; Undo re-creates the entry with the same fields.
+  It gets a new id and `created_at`, because PRD 5.2 says `created_at` is never set by a client (chosen 2026-10-15).
   The other choice, delaying the delete for 10 seconds on the client, loses the delete if the tab closes.
 
 ## Deferred

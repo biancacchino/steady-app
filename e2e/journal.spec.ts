@@ -232,3 +232,76 @@ test("a draft emptied on purpose stays gone, and keeps no stray severity", async
   await newEntry.click();
   await expect(page.getByLabel("Food")).toHaveValue("");
 });
+
+test("a flag is kept after a reload, and says so in words", async ({ page, ip: _ }) => {
+  await signUp(page);
+  await save(page, { occurredAt: "2026-10-05T16:30:00Z", food: "Toast" });
+  await page.goto(weekUrl("2026-10-05"));
+  const flag = page.getByRole("button", { name: /^Flag, Monday 5 October/ });
+  await expect(flag).toHaveAttribute("aria-pressed", "false");
+  await flag.click();
+
+  const flagged = page.getByRole("button", { name: /^Flagged, Monday 5 October/ });
+  await expect(flagged).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("status")).toHaveText("Added to your appointment summary.");
+  await page.reload();
+  await expect(flagged).toHaveAttribute("aria-pressed", "true");
+
+  await flagged.click();
+  await expect(flag).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByRole("status")).toHaveText("Removed from your appointment summary.");
+});
+
+test("delete asks nothing, and Undo brings the entry back", async ({ page, ip: _ }) => {
+  await signUp(page);
+  await save(page, {
+    occurredAt: "2026-10-05T16:30:00Z",
+    food: "Toast",
+    symptom: "bloated",
+    severity: "high",
+    context: ["travel"],
+    flagged: true,
+  });
+  await page.goto(weekUrl("2026-10-05"));
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }).click();
+  await page.getByRole("button", { name: "Delete entry" }).click();
+
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.locator(".entry")).toHaveCount(0);
+  await expect(page.getByRole("status")).toHaveText("Entry deleted.");
+  const undo = page.getByRole("button", { name: "Undo" });
+  // The entry's own button is gone, so focus goes to Undo instead of the page body.
+  await expect(undo).toBeFocused();
+  await undo.click();
+
+  const entry = page.locator(".entry");
+  await expect(entry).toHaveCount(1);
+  await expect(entry).toContainText("Toast");
+  await expect(entry).toContainText("· Severity high");
+  await expect(entry).toContainText("Travel");
+  await expect(page.getByRole("button", { name: /^Flagged, Monday 5 October/ })).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("Entry restored.");
+  await expect(
+    page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }),
+  ).toBeFocused();
+});
+
+test("Undo goes away after 10 seconds, and the delete stays", async ({ page, ip: _ }) => {
+  await page.clock.install();
+  await signUp(page);
+  await save(page, { occurredAt: "2026-10-05T16:30:00Z", food: "Toast" });
+  await page.goto(weekUrl("2026-10-05"));
+  await page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }).click();
+  await page.getByRole("button", { name: "Delete entry" }).click();
+  const undo = page.getByRole("button", { name: "Undo" });
+  await expect(undo).toBeFocused();
+
+  await page.clock.runFor(9_000);
+  await expect(undo).toBeVisible();
+  await page.clock.runFor(1_500);
+  await expect(undo).toHaveCount(0);
+  // Focus does not fall to the page body when Undo disappears.
+  await expect(page.getByRole("button", { name: "New entry" })).toBeFocused();
+  await page.reload();
+  await expect(page.locator(".entry")).toHaveCount(0);
+});

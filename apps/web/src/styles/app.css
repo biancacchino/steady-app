@@ -429,7 +429,7 @@ button.wd {
   position: relative;
   display: grid;
   /* Wide enough for a 12-hour time ("12:30 PM"); a zone name wraps under it. */
-  grid-template-columns: 72px minmax(0, 1fr);
+  grid-template-columns: 72px minmax(0, 1fr) auto;
   gap: 16px;
   padding: 18px 24px 18px 12px;
 }
@@ -491,6 +491,31 @@ button.wd {
 .entry-edit[data-focus-visible] {
   outline: 2px solid var(--primary);
   outline-offset: -2px;
+}
+
+/* Flag: sits above the stretched Edit button, centered on the first line of text */
+.flag {
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  gap: 6px;
+  margin-top: -9px;
+  padding: 0 14px;
+}
+.flag-icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.flag[data-selected] .flag-icon {
+  fill: var(--primary);
+  stroke: var(--primary);
+}
+.delete-entry {
+  margin-right: auto;
 }
 
 /* New entry card: a native dialog, a sheet from the bottom on phones */
@@ -632,8 +657,11 @@ button.wd {
   color: var(--ink);
 }
 
-/* Toast: shown while it has text; role="status" announces it */
+/* Toast: role="status" stays mounted so screen readers announce each new message */
 .toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   position: fixed;
   left: 50%;
   bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -654,9 +682,35 @@ button.wd {
     opacity 200ms ease-out,
     transform 200ms ease-out;
 }
-.toast:not(:empty) {
+.toast p {
+  margin: 0;
+}
+.toast.shown {
   opacity: 1;
   transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.toast:has(.toast-undo) {
+  padding: 4px 4px 4px 18px;
+}
+.toast-undo {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--bg);
+  font: 600 14px / 1 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.toast-undo[data-hovered] {
+  background: color-mix(in srgb, var(--bg) 15%, transparent);
+}
+.toast-undo[data-focus-visible] {
+  outline: 2px solid var(--bg);
+  outline-offset: -4px;
 }
 
 @media (max-width: 480px) {
@@ -684,8 +738,17 @@ button.wd {
   .dlg-foot {
     padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   }
+  .dlg-foot {
+    flex-wrap: wrap;
+  }
   .dlg-foot .btn {
     flex: 1;
+  }
+  /* Delete gets its own row under Cancel and Save, so no label wraps. */
+  .dlg-foot .delete-entry {
+    flex-basis: 100%;
+    order: 1;
+    margin-right: 0;
   }
   .journal-obs {
     padding: 6px 16px 0;
@@ -702,12 +765,21 @@ button.wd {
   .dd-n {
     font-size: 28px;
   }
+  /* Time and Flag share the top row; the fields run full width under them. */
   .entry {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: 6px;
     padding: 18px 16px 18px 4px;
   }
+  .flag {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: -10px;
+  }
   .fields {
+    grid-column: 1 / -1;
+    grid-row: 2;
     grid-template-columns: 68px minmax(0, 1fr);
     gap: 4px 12px;
   }
