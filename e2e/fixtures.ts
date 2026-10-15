@@ -1,4 +1,4 @@
-import { test as base, expect } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
 
 let ipCounter = 0;
 
@@ -46,4 +46,19 @@ export function newUser() {
     email: `test-${id}@example.com`,
     password: "correct horse battery",
   };
+}
+
+export const weekUrl = (week: string) => `/journal?week=${week}`;
+
+/** Signs up a new user through the form and waits for the journal. Returns the user. */
+export async function signUp(page: Page) {
+  const user = newUser();
+  await page.goto("/sign-up");
+  await page.getByLabel("Your name").fill(user.name);
+  await page.getByLabel("Email").fill(user.email);
+  await page.getByLabel("Password").fill(user.password);
+  await page.getByText("I am 18 or older").click();
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/journal$/);
+  return user;
 }

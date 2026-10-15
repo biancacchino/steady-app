@@ -1,27 +1,9 @@
 import type { Page } from "@playwright/test";
 
-import { expect, newUser, test } from "./fixtures";
+import { expect, signUp, test, weekUrl } from "./fixtures";
 
 // A fixed zone and a fixed past week, so the results never depend on today's date.
 test.use({ timezoneId: "America/Toronto" });
-
-const weekUrl = (week: string) => `/journal?week=${week}`;
-
-async function signUp(page: Page) {
-  const user = newUser();
-  await signUpAs(page, user);
-  return user;
-}
-
-async function signUpAs(page: Page, user: ReturnType<typeof newUser>) {
-  await page.goto("/sign-up");
-  await page.getByLabel("Your name").fill(user.name);
-  await page.getByLabel("Email").fill(user.email);
-  await page.getByLabel("Password").fill(user.password);
-  await page.getByText("I am 18 or older").click();
-  await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/journal$/);
-}
 
 async function save(page: Page, entry: Record<string, unknown>) {
   const res = await page.request.post("/api/entries", {

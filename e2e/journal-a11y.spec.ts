@@ -1,6 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 
-import { expect, newUser, test } from "./fixtures";
+import { expect, signUp, test, weekUrl } from "./fixtures";
 
 // Milestone 1 step 8: the journal works from the keyboard alone, and every target is 44px.
 test.use({ timezoneId: "America/Toronto" });
@@ -9,17 +9,8 @@ test.use({ timezoneId: "America/Toronto" });
 // is the target.
 const TARGETS = ["button:visible", "a:visible", ".input", "summary", ".chip"];
 
-const weekUrl = (week: string) => `/journal?week=${week}`;
-
 async function signUpWithEntry(page: Page) {
-  const user = newUser();
-  await page.goto("/sign-up");
-  await page.getByLabel("Your name").fill(user.name);
-  await page.getByLabel("Email").fill(user.email);
-  await page.getByLabel("Password").fill(user.password);
-  await page.getByText("I am 18 or older").click();
-  await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/journal$/);
+  await signUp(page);
   const res = await page.request.post("/api/entries", {
     data: { occurredAt: "2026-10-05T16:30:00Z", timeZone: "America/Toronto", food: "Toast" },
   });
