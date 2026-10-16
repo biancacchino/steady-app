@@ -361,6 +361,9 @@ test("another message does not take Undo away", async ({ page, ip: _ }) => {
 
   await page.getByRole("button", { name: "Edit entry, Monday 5 October 12:30 PM" }).click();
   await page.getByRole("button", { name: "Delete entry" }).click();
+  // Wait for the deleted row to leave: until then the Rice row is moving up, and on a busy phone
+  // run the tap landed where its Flag button used to be.
+  await expect(page.locator(".entry", { hasText: "Toast" })).toHaveCount(0);
   await page.getByRole("button", { name: /^Flag, Monday 5 October 2:30 PM/ }).click();
   await expect(page.locator(".toast-text")).toHaveText(
     "Entry deleted. Added to your appointment summary.",
