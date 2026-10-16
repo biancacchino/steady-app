@@ -179,7 +179,10 @@ function Landing() {
               Research and product idea by <span className="name">Beatrice Javier</span>
             </p>
             <p>
-              Software by <span className="name">Bianca Javier</span>
+              Software by{" "}
+              <Link to="/about/software" className="name">
+                Bianca Javier
+              </Link>
             </p>
           </div>
           <p className="small muted">Steady is a prototype and a work in progress.</p>

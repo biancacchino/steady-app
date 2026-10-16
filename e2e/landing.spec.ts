@@ -111,3 +111,26 @@ test("on wide screens a section heading stays in view while its items scroll", a
   expect(box?.y ?? -1).toBeGreaterThanOrEqual(0);
   expect(box?.y ?? 9999).toBeLessThan(800);
 });
+
+test("the footer credit for Bianca opens the software page", async ({ page, ip: _ }) => {
+  await page.goto("/");
+  await page.getByRole("contentinfo").getByRole("link", { name: "Bianca Javier" }).click();
+  await expect(page).toHaveURL(/\/about\/software$/);
+  await expect(page).toHaveTitle("How Steady is built - Steady");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: "Read the code on GitHub" })).toHaveAttribute(
+    "href",
+    "https://github.com/biancacchino/steady-app",
+  );
+});
+
+// The page reuses landing.css, which the loop above tests at three widths; 320px is the tightest.
+test("the software page has no horizontal scroll at 320px", async ({ page, ip: _ }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/about/software");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBe(0);
+});

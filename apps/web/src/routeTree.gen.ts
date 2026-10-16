@@ -15,6 +15,7 @@ import { Route as JournalRouteImport } from './routes/journal'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SummaryRouteImport } from './routes/summary'
+import { Route as AboutSoftwareRouteImport } from './routes/about.software'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const SummaryRoute = SummaryRouteImport.update({
   path: '/summary',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutSoftwareRoute = AboutSoftwareRouteImport.update({
+  id: '/about/software',
+  path: '/about/software',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/about/software': typeof AboutSoftwareRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/about/software': typeof AboutSoftwareRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,13 +79,27 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/about/software': typeof AboutSoftwareRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/account' | '/journal' | '/sign-in' | '/sign-up' | '/summary'
+    | '/'
+    | '/account'
+    | '/journal'
+    | '/sign-in'
+    | '/sign-up'
+    | '/summary'
+    | '/about/software'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/journal' | '/sign-in' | '/sign-up' | '/summary'
+  to:
+    | '/'
+    | '/account'
+    | '/journal'
+    | '/sign-in'
+    | '/sign-up'
+    | '/summary'
+    | '/about/software'
   id:
     | '__root__'
     | '/'
@@ -86,6 +108,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/summary'
+    | '/about/software'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +118,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SummaryRoute: typeof SummaryRoute
+  AboutSoftwareRoute: typeof AboutSoftwareRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about/software': {
+      id: '/about/software'
+      path: '/about/software'
+      fullPath: '/about/software'
+      preLoaderRoute: typeof AboutSoftwareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -151,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SummaryRoute: SummaryRoute,
+  AboutSoftwareRoute: AboutSoftwareRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
