@@ -17,3 +17,16 @@ This is the study list for after the deadline.
 - Plan pauses and resumes with the same dates.
 - Referral list and crisis line wording (placeholder, needs a person).
 - Placeholder instrument text and threshold 4.
+
+## Milestone 4: Account and polish (PR #17, based on #16)
+
+`comprehend`:
+- `apps/server/src/settings.ts`: the `careTeamLink` schema (email to `mailto:`, https only), the export queries.
+- `apps/web/src/routes/account.tsx`: `CareTeam` and `YourData`.
+- Why `DietPage` shows the plan from the start request's answer and not a refetch (`apps/web/src/routes/diet.tsx`).
+
+`reason`:
+- Export holds the tier and answers but not the score.
+- No axe dependency for the accessibility pass.
+- Unreproduced flaky test: `e2e/summary.spec.ts` "questions can be edited and added" (mobile-safari).
+- Still to do by hand: VoiceOver on macOS and iOS for the new screens.
