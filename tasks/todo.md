@@ -1,3 +1,24 @@
+# Recruiter mode
+
+Plan: two case-study pages (`feat/about-pages`), then a per-visitor live demo (`feat/demo-mode`).
+
+## Part 1: case-study pages (`feat/about-pages`)
+
+- [x] 1. Failing test: the footer's "Bianca Javier" links to `/about/software`, which has one h1 and no horizontal scroll at 320px (landing.css is already tested at 390 and 1280).
+- [x] 2. `/about/software`: what's in it, how a saved entry moves, decisions, testing, link to the repo.
+  Verify: e2e green, `check:tone` green, screenshots at phone and desktop widths.
+- [ ] 3. `/about/research`: blocked on Beatrice's notes. Nothing about her is written until they arrive.
+- [x] 4. Docs: CLAUDE.md repo map, README if it lists pages.
+- [ ] 5. `/ship-wise`, stage, draft the commit for approval.
+
+## Part 2: live demo (`feat/demo-mode`)
+
+Decided 2026-10-16: strict demo, one throwaway account per visitor, deleted after 24 hours.
+Branch from `main` only after `feat/screener-gate` and `feat/account-polish` merge.
+
+- Demo users are default-deny on the server for any write except: PATCH an entry with only the flag, and the summary routes (build, review, export). Everything else is a 403 with a plain message, so new routes are blocked without changes.
+- The screener is visible to demo users, but submitting is blocked, with a note that demo answers aren't saved. Diet content stays gated.
+
 # Milestone 1: Journal
 
 Plan: `docs/prd.md` sections 5.2 and 5.3, layout in `docs/design-brief.md` sections 5 and 6.
