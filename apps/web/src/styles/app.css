@@ -16,7 +16,8 @@ body {
     var(--bg);
   color: var(--ink);
   font: 400 16px / 1.6 var(--sans);
-  padding: 0 16px;
+  /* 16px gutters, wider where a notch or rounded corner needs it (viewport-fit=cover). */
+  padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
   -webkit-font-smoothing: antialiased;
 }
 h1,
@@ -94,7 +95,15 @@ a {
     border-color 150ms var(--ease),
     transform 150ms var(--ease);
 }
-.btn[data-pressed] {
+/* A link styled as a button: same pill, centered label, no underline */
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.btn[data-pressed],
+a.btn:active {
   transform: translateY(1px);
 }
 .btn[data-disabled] {
@@ -106,7 +115,8 @@ a {
   background: var(--primary);
   color: var(--on-primary);
 }
-.btn-primary[data-hovered]:not([data-disabled]) {
+.btn-primary[data-hovered]:not([data-disabled]),
+a.btn-primary:hover {
   background: color-mix(in srgb, var(--primary) 88%, var(--ink));
 }
 .btn-secondary {
@@ -114,7 +124,8 @@ a {
   color: var(--ink);
   border-color: var(--line);
 }
-.btn-secondary[data-hovered] {
+.btn-secondary[data-hovered],
+a.btn-secondary:hover {
   border-color: var(--muted);
 }
 .btn-sm {

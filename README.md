@@ -24,7 +24,8 @@ npm run db:seed                                # create the demo account
 npm run dev                                    # web on http://localhost:5173, API on :3000
 ```
 
-Open http://localhost:5173 and sign in with the demo account: `user@example.com` / `Password123!`.
+Open http://localhost:5173 for the landing page, then choose Sign in and use the demo account: `user@example.com` / `Password123!`.
+The landing page at `/` is open to everyone; its text lives in `apps/web/src/routes/index.tsx`.
 The seed script only runs against a database on this machine, so this account never reaches a real deployment.
 In development, Vite forwards `/api` to the Hono server, so the browser only ever talks to one origin.
 
