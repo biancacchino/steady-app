@@ -47,14 +47,14 @@ Branch: `feat/journal`.
 - Deploy: once there is an email provider, account deletion also needs a link sent to the account's email (Better-Auth `sendDeleteAccountVerification`), and a notice after it is done.
   The link's `/delete-user/callback` route skips the password and phrase check, so check both before sending the link.
 - Deploy: the Account page says database backups are removed within 30 days.
-  Pick a host and set backup retention so that is true.
+  True on Neon's free plan, which keeps 6 hours of history; check again before moving to a paid plan.
 
-- Deploy blocker: set `advanced.ipAddress.trustedProxies` in `packages/auth/src/index.ts` to the host's proxy range, and confirm the proxy sets `x-forwarded-for`.
-  Without it, sign-in rate limiting can be dodged with fake IPs, or one bucket is shared by every user.
-- Deploy blocker: sign-up answers 422 for an email that already has an account, which reveals who uses Steady.
-  Turn on email verification so new and existing emails get the same response, and use a neutral message.
+- Done (tasks/deploy.md step 4): rate limiting reads one header, `CLIENT_IP_HEADER`, set to `cf-connecting-ip` on Render, instead of `trustedProxies`.
+  Still to confirm on the live site: Render's logs show no "could not determine a client IP" warning.
+- Deploy blocker, partly covered: sign-up answers 422 for an email that already has an account.
+  Since PR #8, only someone with the invite code reaches that check. Email verification and a neutral message still need an email provider.
 - Idea for its own `/reason` at deploy time: a per-account failed sign-in counter.
   It stops guessing spread across many IPs; the cost is that anyone who knows an email could lock that account.
 - Email verification and password reset: need an email provider, chosen at deploy time.
-- Host and data region (PRD section 12), needed before any deploy.
-- Deploy: production Postgres must match CI's `postgres:18`, or its time zone list may differ from the one `toTimeZone` is tested against (decision 8).
+- Host: chosen 2026-10-15, Render's free web service with Neon's free Postgres 18 (tasks/deploy.md). The data region is picked when the Neon project is created.
+- Production Postgres must stay on 18 to match CI's `postgres:18` (decision 8); Neon's project version is set at creation.

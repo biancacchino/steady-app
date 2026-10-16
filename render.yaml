@@ -1,0 +1,31 @@
+# Render Blueprint for the hosted MVP (tasks/deploy.md step 5).
+# One free Node web service. Postgres 18 is on Neon's free plan, never Render's free database,
+# which is deleted 44 days after it is created. Put both in the same region.
+services:
+  - type: web
+    name: steady
+    runtime: node
+    plan: free
+    # Region is picked in the dashboard when the Blueprint is applied; match Neon's region.
+    # Dev packages are needed to build (Vite, tsdown) and to migrate (drizzle-kit).
+    buildCommand: npm ci --include=dev && npm run build
+    # Free services have no pre-deploy step, so migrations run before the server starts.
+    startCommand: npm run db:migrate && npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Render's proxy keeps a visitor's own X-Forwarded-For; Cloudflare overwrites this header.
+      - key: CLIENT_IP_HEADER
+        value: cf-connecting-ip
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      # Set in the dashboard: the https address Render gives the service.
+      - key: BETTER_AUTH_URL
+        sync: false
+      # Set in the dashboard: Neon's connection string, ending in ?sslmode=require.
+      - key: DATABASE_URL
+        sync: false
+      # Set in the dashboard: at least 16 characters (openssl rand -hex 16). Share it only with invitees.
+      - key: INVITE_CODE
+        sync: false

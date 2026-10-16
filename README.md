@@ -32,6 +32,18 @@ Sign-up is invite only: a new account needs the `INVITE_CODE` from `apps/server/
 The seed script only runs against a database on this machine, so this account never reaches a real deployment.
 In development, Vite forwards `/api` to the Hono server, so the browser only ever talks to one origin.
 
+## Deploy
+
+Steady runs on Render's free web service with Postgres 18 on Neon's free plan (`tasks/deploy.md`).
+`render.yaml` is the Blueprint: it builds with `npm ci --include=dev && npm run build`, runs migrations, then starts the server, which serves the API and the built app from one origin.
+
+1. Create a Neon project on Postgres 18 and copy its connection string (it ends in `?sslmode=require`).
+2. In Render, choose New, then Blueprint, pick this repository, and use the same region as Neon.
+3. Set `DATABASE_URL`, `INVITE_CODE` (`openssl rand -hex 16`), and `BETTER_AUTH_URL` (the `https://...onrender.com` address) in the dashboard. Render generates `BETTER_AUTH_SECRET`.
+4. Never use Render's free Postgres: it is deleted 44 days after it is created.
+
+The free web service sleeps after 15 minutes without visitors, so the first visit after that takes about a minute.
+
 ## Checks
 
 ```sh

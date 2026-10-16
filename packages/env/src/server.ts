@@ -22,6 +22,13 @@ export const env = createEnv({
     // Sign-up is invite only: the shared code people need to create an account.
     // At least 16 characters, so it cannot be guessed within the sign-up rate limit.
     INVITE_CODE: z.string().min(16),
+    // The one request header that holds the visitor's address, for rate limiting. Each test and
+    // the Vite dev proxy set X-Forwarded-For. On Render it must be cf-connecting-ip: Render keeps
+    // whatever X-Forwarded-For the visitor sent, while Cloudflare overwrites CF-Connecting-IP.
+    CLIENT_IP_HEADER: z
+      .string()
+      .regex(/^[a-z0-9-]+$/)
+      .default("x-forwarded-for"),
     PORT: z.coerce.number().int().default(3000),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   },
