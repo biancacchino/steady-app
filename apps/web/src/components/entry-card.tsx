@@ -150,7 +150,6 @@ export function EntryCard({ target, userId, onClose, onSaved, onDeleted }: Props
       setError(message ?? "Your entry could not be deleted. Try again.");
       return;
     }
-    saved.current = true;
     onDeleted(entry, byPointer);
     close();
   }
