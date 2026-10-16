@@ -45,6 +45,7 @@ test("deleting the account removes it and its journal, and frees the email", asy
 
   // The same email can sign up again and starts with an empty journal.
   await page.goto("/sign-up");
+  await page.getByLabel("Invite code").fill(user.inviteCode);
   await page.getByLabel("Your name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);

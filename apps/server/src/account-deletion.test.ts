@@ -18,16 +18,14 @@ const emails: string[] = [];
 async function signUpWithEntry(name: string) {
   const email = `${name.toLowerCase()}-${randomUUID()}@example.com`;
   emails.push(email);
-  const res = await auth.api.signUpEmail({
-    body: {
-      name,
-      email,
-      password: PASSWORD,
-      ageConfirmedAt: new Date(),
-      inviteCode: env.INVITE_CODE,
-    },
-    asResponse: true,
-  });
+  const body = {
+    name,
+    email,
+    password: PASSWORD,
+    ageConfirmedAt: new Date(),
+    inviteCode: env.INVITE_CODE,
+  };
+  const res = await auth.api.signUpEmail({ body, asResponse: true });
   const cookie = res.headers.getSetCookie()[0]?.split(";")[0];
   if (!cookie) throw new Error("Sign-up returned no session cookie.");
   const { user: created } = (await res.json()) as { user: { id: string } };
