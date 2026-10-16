@@ -429,6 +429,9 @@ function SiteHead() {
           <Link to="/summary" className="btn btn-secondary btn-sm">
             Appointment summary
           </Link>
+          <Link to="/diet" className="btn btn-secondary btn-sm">
+            Diet plan
+          </Link>
           <Link to="/account" className="btn btn-secondary btn-sm">
             Account
           </Link>

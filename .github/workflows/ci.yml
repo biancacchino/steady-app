@@ -52,6 +52,8 @@ jobs:
         run: npm test
       - name: Production build
         run: npm run build
+      - name: Bundle check (no diet content in the web app)
+        run: npm run check:bundle
       - name: Dependency audit (high and critical)
         run: npm run audit
       - name: Install browsers
