@@ -11,7 +11,7 @@ Health data raises the bar: anything touching screening, export, sharing, or thi
 
 ## Repo map
 
-- `apps/web` - React + TanStack Router app. Routes in `src/routes`, React Aria components in `src/components`, tokens in `src/styles/tokens.css`.
+- `apps/web` - React + TanStack Router app. Routes in `src/routes`, React Aria components in `src/components`, tokens in `src/styles/tokens.css`. `src/routes/index.tsx` is the landing page at `/` for everyone (styles in `src/styles/landing.css`); signed-in visitors get "Open your journal" instead of "Try it out" and "Sign in".
 - `apps/server` - Hono server. `src/app.ts` holds middleware, security headers, the error handler, and routes; `src/entries.ts` is the journal entries API; `src/index.ts` starts it. In production it also serves `apps/web/dist`.
 - `packages/auth` - Better-Auth config (18+ confirmation, rate limit).
 - `packages/db` - Drizzle schema in `src/schema`, migrations in `src/migrations`, Postgres in `docker-compose.yml`.

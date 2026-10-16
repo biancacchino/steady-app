@@ -16,6 +16,11 @@
   A cue that only shows up on some entries (like a rule only when a symptom exists) makes entries look inconsistent.
   Use the same labeled rows on every entry, with an explicit empty value like "None noted".
 
+## Copy
+
+- All user-facing copy, including marketing pages, gets an avoid-ai-writing pass in a warm, plain voice before it ships.
+  Plain and friendly beats formal: "Why Steady exists" over "Two gaps, one app", contractions are fine, no slogans or meta lines like "Three design decisions, each answering...".
+
 ## Checks
 
 - Read a check's exit code, not the last lines of its output.

@@ -3,6 +3,7 @@ import "@fontsource/hanken-grotesk/400.css";
 import "@fontsource/hanken-grotesk/500.css";
 import "./styles/tokens.css";
 import "./styles/app.css";
+import "./styles/landing.css";
 
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
