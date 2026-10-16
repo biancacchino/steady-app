@@ -4,10 +4,18 @@ import { randomUUID } from "node:crypto";
 import { auth } from "@steady/auth";
 import { db } from "@steady/db";
 import { user } from "@steady/db/schema/index";
+import { env } from "@steady/env/server";
 import { eq } from "drizzle-orm";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const emails: string[] = [];
+// The invite code is sent, so sign-up gets past the invite check to the writes being tested.
+const maya = {
+  name: "Maya",
+  password: "Password123!",
+  ageConfirmedAt: new Date(),
+  inviteCode: env.INVITE_CODE,
+};
 
 afterEach(async () => {
   vi.restoreAllMocks();
@@ -27,7 +35,7 @@ describe("sign-up", () => {
 
     await expect(
       auth.api.signUpEmail({
-        body: { name: "Maya", email, password: "Password123!", ageConfirmedAt: new Date() },
+        body: { ...maya, email },
       }),
     ).rejects.toThrow();
 
@@ -38,7 +46,7 @@ describe("sign-up", () => {
     const email = `atomic-${randomUUID()}@example.com`;
     emails.push(email);
     const res = await auth.api.signUpEmail({
-      body: { name: "Maya", email, password: "Password123!", ageConfirmedAt: new Date() },
+      body: { ...maya, email },
     });
     expect(res.user.email).toBe(email);
   });
