@@ -38,8 +38,11 @@ type Props = {
   /** Called after the dialog closes; `keptDraft` is true when an unsaved new entry was kept. */
   onClose: (keptDraft: boolean) => void;
   onSaved: (entry: CardEntry) => void;
-  /** Called after an edited entry is deleted, with the entry as it was, so it can be undone. */
-  onDeleted: (entry: CardEntry) => void;
+  /**
+   * Called after an edited entry is deleted, with the entry as it was, so it can be undone.
+   * `byPointer` is true when Delete was clicked or tapped.
+   */
+  onDeleted: (entry: CardEntry, byPointer: boolean) => void;
 };
 
 /**
@@ -133,7 +136,7 @@ export function EntryCard({ target, userId, onClose, onSaved, onDeleted }: Props
   }
 
   // PRD 5.2: no confirmation; the journal offers Undo instead.
-  async function remove(entry: CardEntry) {
+  async function remove(entry: CardEntry, byPointer: boolean) {
     setError(null);
     let res: Response;
     try {
@@ -147,8 +150,7 @@ export function EntryCard({ target, userId, onClose, onSaved, onDeleted }: Props
       setError(message ?? "Your entry could not be deleted. Try again.");
       return;
     }
-    saved.current = true;
-    onDeleted(entry);
+    onDeleted(entry, byPointer);
     close();
   }
 
@@ -248,7 +250,12 @@ export function EntryCard({ target, userId, onClose, onSaved, onDeleted }: Props
         </div>
         <div className="dlg-foot">
           {editing && (
-            <Button className="btn btn-secondary delete-entry" onPress={() => void remove(editing)}>
+            <Button
+              className="btn btn-secondary delete-entry"
+              onPress={(event) =>
+                void remove(editing, ["mouse", "touch", "pen"].includes(event.pointerType))
+              }
+            >
               Delete entry
             </Button>
           )}

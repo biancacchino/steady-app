@@ -6,6 +6,11 @@ What it must do is in `docs/prd.md`.
 How it should look is in `docs/design-brief.md`.
 How the pieces fit is in `design/steady-stack.html`.
 
+## What works today
+
+The journal (milestone 1): log what you ate and any symptoms, see one week at a time with plain observations, edit entries, flag the ones worth raising at an appointment, and delete with Undo.
+The appointment summary (milestone 2) and the screener gate (milestone 3) come next.
+
 ## Run it locally
 
 You need Node 24 and a Docker engine (OrbStack or Docker Desktop).
@@ -32,6 +37,7 @@ npm run ci
 This runs everything CI runs, in order: format, lint, type check, tone check, unit tests, production build, dependency audit, and the Playwright tests in Chrome, Firefox, Safari, and iPhone Safari.
 Every Playwright test also fails if the page requests anything from another website or breaks the Content Security Policy.
 The Playwright tests build and start the production server on port 3100 and need Postgres running.
+They never reuse a server already on that port, which may be another worktree's build; set `E2E_PORT` to run them in a second worktree at the same time.
 The unit tests need it too, with migrations applied: some check the database's rules and the entries API against the real tables.
 The first time, install the browsers with `npx playwright install`.
 

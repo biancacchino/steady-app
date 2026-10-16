@@ -22,9 +22,14 @@ Branch: `feat/journal`.
 - [x] 7. Flag toggle ("Flag" or "Flagged" with an icon, not color alone) and delete with a 10-second Undo, no confirmation.
   Verify: Playwright test flags, reloads, sees it kept; deletes, undoes, sees it back.
   Done: no server change was needed. Delete lives in the Edit card; focus moves to Undo, then to the restored entry or to New entry when Undo expires.
-- [ ] 8. Accessibility and tone: keyboard-only run through the whole journal, 44px targets, reduced motion, `npm run check:tone` green.
+- [x] 8. Accessibility and tone: keyboard-only run through the whole journal, 44px targets, reduced motion, `npm run check:tone` green.
   Verify: manual keyboard pass and a VoiceOver pass on macOS, notes in the PR.
-- [ ] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
+  Done: `e2e/journal-a11y.spec.ts` covers the keyboard run (desktop browsers), 44px targets at desktop and phone widths, and reduced motion; `check:tone` is green.
+  Undo's 10 seconds now pause while it is hovered or keyboard-focused (WCAG 2.2.1, chosen 2026-10-15).
+  Review fix (decision 23): pending deletes are kept apart from messages, so a Flag or draft message no longer takes Undo away; one Undo restores every entry deleted in the last 10 seconds; a stale hover flag no longer keeps Undo on screen.
+  VoiceOver pass on macOS (Safari) done by hand 2026-10-15: week view, entry card, Flag, delete and Undo; no issues found.
+- [x] 9. Docs: README, CLAUDE.md (`Modal` warning replaced in step 6), PRD only if something changed.
+  Done: README "What works today" and `E2E_PORT`; the CLAUDE.md `Modal` note was already right; PRD 5.2 records the Undo pause.
 - [ ] 10. `/ship-wise`, then stage and draft the commit for approval.
 
 ## Defaults I picked (say if you want them changed)
