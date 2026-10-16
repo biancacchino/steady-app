@@ -8,7 +8,9 @@ import { clearDraft } from "@/lib/draft";
 
 // Sign-up is invite only, so visitors without a code ask by email. Nothing is stored in Steady.
 export const WAITLIST_EMAIL = "steadyappjournal@gmail.com";
-export const WAITLIST_HREF = `mailto:${WAITLIST_EMAIL}?subject=Steady%20waitlist`;
+const WAITLIST_BODY =
+  "Hi, I'd like to join the Steady waitlist. I'm 18 or older, and I give you permission to email me at this address about getting access.";
+export const WAITLIST_HREF = `mailto:${WAITLIST_EMAIL}?subject=${encodeURIComponent("Steady waitlist")}&body=${encodeURIComponent(WAITLIST_BODY)}`;
 
 /**
  * The header on every page. Signed out, it offers the waitlist and sign in; signed in, the app's

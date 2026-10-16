@@ -54,7 +54,10 @@ test("signed out, Join the waitlist opens an email to a real address", async ({ 
   await expect(main.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/sign-in");
   const href = await main.getByRole("link", { name: "Join the waitlist" }).getAttribute("href");
   const email = "steadyappjournal@gmail.com";
-  expect(href).toBe(`mailto:${email}?subject=Steady%20waitlist`);
+  const url = new URL(href ?? "");
+  expect(url.pathname).toBe(email);
+  expect(url.searchParams.get("subject")).toBe("Steady waitlist");
+  expect(url.searchParams.get("body")).toContain("permission to email me");
   // Without a default mail app the link does nothing, so the address is also shown as text.
   await expect(main.getByText(`Or email ${email}`)).toBeVisible();
 });
