@@ -58,6 +58,13 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit
       - name: End-to-end tests
         run: npm run e2e
+      - name: Upload traces from failed end-to-end tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: test-results/
+          retention-days: 7
 
   secrets:
     runs-on: ubuntu-latest
