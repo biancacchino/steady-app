@@ -44,6 +44,11 @@ Branch: `feat/journal`.
 
 ## Deferred
 
+- Deploy: once there is an email provider, account deletion also needs a link sent to the account's email (Better-Auth `sendDeleteAccountVerification`), and a notice after it is done.
+  The link's `/delete-user/callback` route skips the password and phrase check, so check both before sending the link.
+- Deploy: the Account page says database backups are removed within 30 days.
+  Pick a host and set backup retention so that is true.
+
 - Deploy blocker: set `advanced.ipAddress.trustedProxies` in `packages/auth/src/index.ts` to the host's proxy range, and confirm the proxy sets `x-forwarded-for`.
   Without it, sign-in rate limiting can be dodged with fake IPs, or one bucket is shared by every user.
 - Deploy blocker: sign-up answers 422 for an email that already has an account, which reveals who uses Steady.

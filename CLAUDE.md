@@ -11,9 +11,9 @@ Health data raises the bar: anything touching screening, export, sharing, or thi
 
 ## Repo map
 
-- `apps/web` - React + TanStack Router app. Routes in `src/routes`, React Aria components in `src/components`, tokens in `src/styles/tokens.css`. `src/routes/summary.tsx` is the appointment summary (styles in `src/styles/summary.css`). `src/routes/index.tsx` is the landing page at `/` for everyone (styles in `src/styles/landing.css`); signed-out visitors get "Join the waitlist" (an email link) and "Sign in"; signed-in visitors get "Open your journal".
+- `apps/web` - React + TanStack Router app. Routes in `src/routes`, React Aria components in `src/components`, tokens in `src/styles/tokens.css`. `src/routes/summary.tsx` is the appointment summary (styles in `src/styles/summary.css`). `src/routes/account.tsx` is the Account page with account deletion. `src/routes/index.tsx` is the landing page at `/` for everyone (styles in `src/styles/landing.css`); signed-out visitors get "Join the waitlist" (an email link) and "Sign in"; signed-in visitors get "Open your journal".
 - `apps/server` - Hono server. `src/app.ts` holds middleware, security headers, the error handler, and routes; `src/entries.ts` is the journal entries API; `src/summaries.ts` is the appointment summary API, with its content in `src/summary-content.ts` and its PDF in `src/summary-pdf.ts` (pdfkit); `src/index.ts` starts it. In production it also serves `apps/web/dist`.
-- `packages/auth` - Better-Auth config (invite-only sign-up via `INVITE_CODE`, 18+ confirmation, rate limit).
+- `packages/auth` - Better-Auth config (invite-only sign-up via `INVITE_CODE`, 18+ confirmation, rate limit, account deletion with password and typed phrase).
 - `packages/db` - Drizzle schema in `src/schema`, migrations in `src/migrations`, Postgres in `docker-compose.yml`.
 - `packages/env` - Validated server environment variables.
 - `scripts` - `check-tone.mjs`, with tests in `checks.test.mjs`. Third-party loads are caught by `e2e/fixtures.ts`.
@@ -52,6 +52,7 @@ Biome for lint and format, Vitest, Playwright.
 - Colors come only from tokens. Change values in `design/steady-design.html` first, then copy them.
 - No eyebrows (small labels above or beside headings) and no italic or accent-word headlines. See `tasks/lessons.md`.
 - Every API route except `/api/auth/*` requires a session. Every query on user data must filter by the session's user id.
+- Every table with user data references `user.id` with `onDelete: "cascade"`, so account deletion removes it. `apps/server/src/account-deletion.test.ts` fails otherwise.
 - Server logs hold method, path, and status only. Never log an error object: database errors include the query's values, which can be journal text.
 - Environment variables are declared and validated in `packages/env/src/server.ts`.
 - Commit messages and PRs carry no AI attribution: no "Generated with Claude Code" line and no `Co-Authored-By: Claude` trailer.

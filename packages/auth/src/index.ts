@@ -7,6 +7,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 
 const MAX_NAME_LENGTH = 100;
+// Must match apps/web/src/routes/account.tsx.
+const DELETE_PHRASE = "delete my account";
 
 // Hashing first gives both sides the same length, so the comparison takes the same time whatever
 // was typed and leaks nothing about the code.
@@ -31,16 +33,35 @@ export const auth = betterAuth({
       ageConfirmedAt: { type: "date", required: true, input: true },
       careTeamLink: { type: "string", required: false, input: false },
     },
+    // Deleting the user row cascades to sessions, accounts, and journal entries in one statement
+    // (docs/prd.md section 4). apps/server/src/account-deletion.test.ts fails if a table does not.
+    deleteUser: { enabled: true },
   },
-  // Sign-up is invite only (tasks/deploy.md). This runs before Better-Auth looks up the email, so
-  // without the code nobody can learn whether an email already has an account.
-  // ponytail: one shared code; single-use codes in the database if it leaks or many people use it.
+  // One request hook, so neither check can be dropped by a second `hooks` key (the later key
+  // would silently replace the earlier one).
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
+      // Sign-up is invite only (tasks/deploy.md). This runs before Better-Auth looks up the email,
+      // so without the code nobody can learn whether an email already has an account.
+      // ponytail: one shared code; single-use codes in the database if it leaks or many use it.
       if (ctx.path === "/sign-up/email" && !isInviteCode(ctx.body?.inviteCode)) {
         throw new APIError("FORBIDDEN", {
           message: "That invite code doesn't work. Check it and try again.",
         });
+      }
+      // Better-Auth skips the password on a session under a day old; Steady always asks for it,
+      // so someone holding an unlocked phone cannot delete the account. The phrase stops accidents.
+      if (ctx.path === "/delete-user") {
+        const body = (ctx.body ?? {}) as { password?: unknown; confirm?: unknown };
+        if (!body.password) {
+          throw new APIError("BAD_REQUEST", { message: "Enter your password." });
+        }
+        if (
+          typeof body.confirm !== "string" ||
+          body.confirm.trim().toLowerCase() !== DELETE_PHRASE
+        ) {
+          throw new APIError("BAD_REQUEST", { message: `Type "${DELETE_PHRASE}" to confirm.` });
+        }
       }
     }),
   },
@@ -75,9 +96,9 @@ export const auth = betterAuth({
     },
   },
   // On in every environment, not only production (Better-Auth's default).
-  // Sign-in and sign-up allow 3 attempts per 10 seconds per IP.
+  // Sign-in, sign-up, and delete-user allow 3 attempts per 10 seconds per IP.
   // ponytail: in-memory store, resets on restart and is per server process; move to the
   // database store if Steady ever runs more than one server.
   // Deploy blocker: set advanced.ipAddress.trustedProxies to the host's proxy range (tasks/todo.md).
-  rateLimit: { enabled: true },
+  rateLimit: { enabled: true, customRules: { "/delete-user": { window: 10, max: 3 } } },
 });

@@ -1,11 +1,5 @@
 /* Appointment summary at /summary, ported from design/steady-design.html ("summary sheet" and
    "PDF preview"). Colors come only from tokens.css. Entries reuse the journal's styles in app.css. */
-.head-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-}
 .sum-setup {
   display: grid;
   gap: 20px;
