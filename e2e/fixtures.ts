@@ -54,6 +54,14 @@ export function newUser() {
 
 export const weekUrl = (week: string) => `/journal?week=${week}`;
 
+/** Saves an entry through the API, logged in Toronto unless the entry says otherwise. */
+export async function save(page: Page, entry: Record<string, unknown>) {
+  const res = await page.request.post("/api/entries", {
+    data: { timeZone: "America/Toronto", ...entry },
+  });
+  expect(res.status()).toBe(201);
+}
+
 /** Signs up a new user through the form and waits for the journal. Returns the user. */
 export async function signUp(page: Page) {
   const user = newUser();

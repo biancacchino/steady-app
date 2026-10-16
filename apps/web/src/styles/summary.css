@@ -1,0 +1,280 @@
+/* Appointment summary at /summary, ported from design/steady-design.html ("summary sheet" and
+   "PDF preview"). Colors come only from tokens.css. Entries reuse the journal's styles in app.css. */
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.sum-setup {
+  display: grid;
+  gap: 20px;
+}
+.sum-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+.sum-inputs .field {
+  flex: 1 1 200px;
+}
+
+.sheet {
+  background: var(--surface-warm);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sheet);
+  padding: clamp(20px, 5vw, 44px);
+  display: grid;
+  gap: 28px;
+  min-width: 0;
+}
+.sum-head {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.fields.sum-meta {
+  grid-template-columns: 104px minmax(0, 1fr);
+}
+.sheet .title {
+  font: 400 36px / 1.05 var(--display);
+  letter-spacing: -0.03em;
+}
+.sheet h3 {
+  font: 500 18px / 1.35 var(--sans);
+}
+.sheet .part {
+  display: grid;
+  gap: 10px;
+}
+
+.flags {
+  border-block: 1px solid var(--line);
+}
+.sheet .day-date {
+  padding-left: 0;
+}
+.sheet .entry {
+  padding-right: 0;
+}
+.incl {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  align-self: start;
+  min-height: 44px;
+  font: 500 13px / 1 var(--sans);
+  color: var(--muted);
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease),
+    color 150ms var(--ease);
+}
+.incl:hover {
+  border-color: var(--muted);
+  color: var(--ink);
+}
+.incl:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--ink);
+}
+.incl:has(input:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.incl input {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+.incl input:focus-visible {
+  outline: none;
+}
+.sheet .entry .fields {
+  transition: opacity 150ms var(--ease);
+}
+.entry:has(.incl input:not(:checked)) .fields {
+  opacity: 0.5;
+}
+.excl-note {
+  grid-column: 2;
+  font-size: 13px;
+  color: var(--muted);
+  display: none;
+}
+.entry:has(.incl input:not(:checked)) .excl-note {
+  display: block;
+}
+.flags-empty {
+  padding: 16px 0;
+  color: var(--muted);
+}
+
+.qs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.q-input {
+  display: block;
+  font: 400 16px / 1.5 var(--sans);
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 8px 0;
+  width: 100%;
+  min-height: 44px;
+  resize: none;
+  field-sizing: content;
+  transition: border-color 150ms var(--ease);
+}
+.q-input:hover {
+  border-bottom-color: var(--muted);
+}
+.q-input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.export {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.pdf-toggle {
+  gap: 8px;
+}
+.pdf-toggle svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 150ms var(--ease);
+}
+.pdf-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.pdf-body {
+  display: grid;
+  gap: 12px;
+}
+.pdf-body[hidden] {
+  display: none;
+}
+
+/* The exported document keeps the compact list, always on white paper. */
+.paper {
+  max-width: 680px;
+  display: grid;
+  gap: 22px;
+  background: var(--paper);
+  color: var(--paper-ink);
+  border: 1px solid var(--paper-line);
+  border-radius: 4px;
+  padding: clamp(24px, 5vw, 48px);
+  font: 400 14px / 1.55 var(--sans);
+}
+.paper h4 {
+  margin: 0;
+  font: 400 28px / 1.1 var(--display);
+  letter-spacing: -0.02em;
+}
+.paper h5 {
+  margin: 0 0 8px;
+  font: 500 14px / 1.4 var(--sans);
+}
+.paper p {
+  max-width: 62ch;
+}
+.p-meta,
+.p-fields {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 2px 12px;
+  margin: 0;
+}
+.p-fields {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+.p-meta dt,
+.p-fields dt {
+  color: var(--paper-muted);
+}
+.p-meta dd,
+.p-fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.p-meta {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--paper-line);
+}
+.p-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--paper-line);
+}
+.p-row {
+  display: grid;
+  grid-template-columns: 136px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--paper-line);
+}
+.p-row > span {
+  color: var(--paper-muted);
+  font-variant-numeric: tabular-nums;
+}
+.paper .none {
+  color: var(--paper-muted);
+}
+.p-q {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+@media (max-width: 480px) {
+  .export .btn {
+    flex: 1 1 100%;
+  }
+  .sheet .entry .incl {
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: -10px;
+  }
+  .excl-note {
+    grid-column: 1 / -1;
+  }
+  .p-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .p-meta {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+  .fields.sum-meta {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+}

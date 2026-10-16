@@ -1,6 +1,7 @@
 import {
   createFileRoute,
   type ErrorComponentProps,
+  Link,
   redirect,
   useNavigate,
   useRouter,
@@ -9,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, ToggleButton } from "react-aria-components";
 
 import { type CardEntry, type CardTarget, EntryCard } from "@/components/entry-card";
+import { EntryFields } from "@/components/entry-fields";
 import { FormError } from "@/components/fields";
 import { authClient, getSession } from "@/lib/auth-client";
 import { clearDraft } from "@/lib/draft";
@@ -325,7 +327,6 @@ function Journal() {
   );
 }
 
-// The same three labeled rows on every entry, with an explicit empty value (tasks/lessons.md).
 function EntryRow({
   entry,
   viewerZone,
@@ -342,7 +343,6 @@ function EntryRow({
   const router = useRouter();
   const [flagged, setFlagged] = useState(entry.flagged);
   const saving = useRef(false);
-  const none = <dd className="v none">None noted</dd>;
   const time = entryTime(entry, viewerZone);
   const when = `${longDay(entryDay(entry))} ${time}`;
 
@@ -382,32 +382,7 @@ function EntryRow({
       <div className="entry-time">
         <time dateTime={entry.occurredAt}>{time}</time>
       </div>
-      <dl className="fields">
-        <dt className="k">Food</dt>
-        {entry.food ? <dd className="v">{entry.food}</dd> : none}
-        <dt className="k">Symptoms</dt>
-        {entry.symptom ? (
-          <dd className="v">
-            {entry.symptom}
-            {entry.severity && (
-              <>
-                {" "}
-                <span className="sev-note">· Severity {entry.severity}</span>
-              </>
-            )}
-          </dd>
-        ) : (
-          none
-        )}
-        <dt className="k">Context</dt>
-        {entry.context.length > 0 ? (
-          <dd className="v">
-            {entry.context.map((c) => c[0]?.toUpperCase() + c.slice(1)).join(", ")}
-          </dd>
-        ) : (
-          <dd className="v none">None</dd>
-        )}
-      </dl>
+      <EntryFields entry={entry} />
       {/* Words and a filled icon, never color alone (design brief, "Flagging"). The visible word
           starts the name, and the time tells entries apart for screen readers. */}
       <ToggleButton
@@ -450,9 +425,14 @@ function SiteHead() {
     <>
       <header className="site-head">
         <span className="wordmark">Steady</span>
-        <Button className="btn btn-secondary btn-sm" onPress={() => void signOut()}>
-          Sign out
-        </Button>
+        <div className="head-actions">
+          <Link to="/summary" className="btn btn-secondary btn-sm">
+            Appointment summary
+          </Link>
+          <Button className="btn btn-secondary btn-sm" onPress={() => void signOut()}>
+            Sign out
+          </Button>
+        </div>
       </header>
       {error && (
         <div className="site-error">
