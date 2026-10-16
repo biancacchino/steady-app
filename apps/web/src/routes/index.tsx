@@ -131,8 +131,8 @@ function Landing() {
           <div className="sec-head">
             <h2 id="source-title">Where this is coming from</h2>
             <p className="muted">
-              Steady was started by Beatrice Javier, a critical care nurse (CCRN). Each design
-              choice traces back to her sources.
+              Steady was started by Beatrice Javier, RN. Each design choice traces back to her
+              sources.
             </p>
           </div>
           <div className="items">
