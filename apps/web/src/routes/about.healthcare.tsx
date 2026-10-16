@@ -24,6 +24,12 @@ function AboutHealthcare() {
           <Link to="/" hash="source-title" className="btn btn-primary">
             See where Steady comes from
           </Link>
+          <a
+            href="https://www.linkedin.com/in/beatrice-javier-1061291a7/"
+            className="btn btn-secondary"
+          >
+            Beatrice on LinkedIn
+          </a>
         </div>
       </section>
     </main>

@@ -103,3 +103,23 @@ test.describe("on a phone", () => {
     }
   });
 });
+
+test("the about pages link each author's profiles", async ({ page, ip: _ }) => {
+  await page.goto("/about/healthcare");
+  const health = page.getByRole("main");
+  await expect(health.getByRole("link", { name: "Beatrice on LinkedIn" })).toHaveAttribute(
+    "href",
+    "https://www.linkedin.com/in/beatrice-javier-1061291a7/",
+  );
+
+  await page.goto("/about/software");
+  const software = page.getByRole("main");
+  await expect(software.getByRole("link", { name: "My LinkedIn" })).toHaveAttribute(
+    "href",
+    "https://www.linkedin.com/in/javierbianca/",
+  );
+  await expect(software.getByRole("link", { name: "My GitHub" })).toHaveAttribute(
+    "href",
+    "https://github.com/biancacchino",
+  );
+});

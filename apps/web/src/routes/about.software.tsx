@@ -28,6 +28,12 @@ function AboutSoftware() {
           <a href="https://github.com/biancacchino/steady-app" className="btn btn-primary">
             Read the code on GitHub
           </a>
+          <a href="https://www.linkedin.com/in/javierbianca/" className="btn btn-secondary">
+            My LinkedIn
+          </a>
+          <a href="https://github.com/biancacchino" className="btn btn-secondary">
+            My GitHub
+          </a>
         </div>
       </section>
 
