@@ -1,16 +1,7 @@
-import { expect, newUser, test } from "./fixtures";
+import { expect, newUser, signUp, test } from "./fixtures";
 
 test("signing up opens the journal", async ({ page, ip: _ }) => {
-  const user = newUser();
-  await page.goto("/sign-up");
-  await page.getByLabel("Invite code").fill(user.inviteCode);
-  await page.getByLabel("Your name").fill(user.name);
-  await page.getByLabel("Email").fill(user.email);
-  await page.getByLabel("Password").fill(user.password);
-  await page.getByText("I am 18 or older").click();
-  await page.getByRole("button", { name: "Create account" }).click();
-
-  await expect(page).toHaveURL(/\/journal$/);
+  await signUp(page);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page).toHaveTitle("Journal - Steady");
 });
@@ -80,15 +71,7 @@ test("the server refuses a sign-up without age confirmation", async ({ request, 
 });
 
 test("signing out returns to sign in and locks the journal", async ({ page, ip: _ }) => {
-  const user = newUser();
-  await page.goto("/sign-up");
-  await page.getByLabel("Invite code").fill(user.inviteCode);
-  await page.getByLabel("Your name").fill(user.name);
-  await page.getByLabel("Email").fill(user.email);
-  await page.getByLabel("Password").fill(user.password);
-  await page.getByText("I am 18 or older").click();
-  await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/journal$/);
+  await signUp(page);
 
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
@@ -97,15 +80,7 @@ test("signing out returns to sign in and locks the journal", async ({ page, ip: 
 });
 
 test("a failed sign-out says so and stays on the journal", async ({ page, ip: _ }) => {
-  const user = newUser();
-  await page.goto("/sign-up");
-  await page.getByLabel("Invite code").fill(user.inviteCode);
-  await page.getByLabel("Your name").fill(user.name);
-  await page.getByLabel("Email").fill(user.email);
-  await page.getByLabel("Password").fill(user.password);
-  await page.getByText("I am 18 or older").click();
-  await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/journal$/);
+  await signUp(page);
 
   await page.route("**/api/auth/sign-out", (route) => route.abort());
   await page.getByRole("button", { name: "Sign out" }).click();
