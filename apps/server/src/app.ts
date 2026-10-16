@@ -7,6 +7,7 @@ import { bodyLimit } from "hono/body-limit";
 import { secureHeaders } from "hono/secure-headers";
 
 import { entries } from "./entries";
+import { summaries } from "./summaries";
 
 export type Variables = { user: typeof auth.$Infer.Session.user };
 
@@ -38,6 +39,12 @@ app.use(
   }),
 );
 
+// API answers carry journal text, so no browser keeps a copy on disk (a shared computer).
+app.use("/api/*", async (c, next) => {
+  await next();
+  c.header("cache-control", "no-store");
+});
+
 // No request needs more than a few kilobytes yet. The limit stops one request from storing megabytes.
 app.use(
   "/api/*",
@@ -63,6 +70,7 @@ app.onError((err, c) => {
 });
 
 app.route("/api/entries", entries);
+app.route("/api/summaries", summaries);
 
 app.get("/api/me", (c) => {
   const { id, email, name } = c.get("user");

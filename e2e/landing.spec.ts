@@ -90,7 +90,8 @@ for (const width of [320, 390, 1280]) {
 
     for (const name of ["Join the waitlist", "Sign in"]) {
       const box = await page.getByRole("link", { name }).boundingBox();
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+      // Rounded, because Firefox and 3x screens can report 44px as 43.99999.
+      expect(Math.round(box?.height ?? 0)).toBeGreaterThanOrEqual(44);
     }
   });
 }

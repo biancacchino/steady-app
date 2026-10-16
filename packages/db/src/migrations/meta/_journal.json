@@ -15,6 +15,13 @@
       "when": 1792038090676,
       "tag": "0001_nosy_forgotten_one",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792118662114,
+      "tag": "0002_stiff_kat_farrell",
+      "breakpoints": true
     }
   ]
 }

@@ -74,7 +74,7 @@ const editBody = z
   .refine((body) => Object.keys(body).length > 0)
   .refine((body) => (body.occurredAt === undefined) === (body.timeZone === undefined));
 
-const range = z.object({ from: z.iso.date(), to: z.iso.date() }).refine(({ from, to }) => {
+export const range = z.object({ from: z.iso.date(), to: z.iso.date() }).refine(({ from, to }) => {
   const days = (Date.parse(to) - Date.parse(from)) / 86_400_000 + 1;
   return Date.parse(from) >= EARLIEST && days >= 1 && days <= MAX_RANGE_DAYS;
 });
@@ -84,6 +84,21 @@ const entryId = z.uuid();
 // Everything the browser sees: every column except these two. A new column is returned by
 // default, so a column the browser must not see has to be added to this list.
 const { userId: _userId, updatedAt: _updatedAt, ...columns } = getTableColumns(journalEntry);
+
+/**
+ * One user's entries whose local date, in the zone they were logged in, falls in the range
+ * (decision 4), oldest first. The journal and the appointment summary both read through this.
+ */
+export function entriesInRange(userId: string, from: string, to: string) {
+  const localDate = sql`(${journalEntry.occurredAt} at time zone ${journalEntry.timeZone})::date`;
+  return db
+    .select(columns)
+    .from(journalEntry)
+    .where(
+      and(eq(journalEntry.userId, userId), sql`${localDate} between ${from}::date and ${to}::date`),
+    )
+    .orderBy(asc(journalEntry.occurredAt));
+}
 
 function constraintMessage(error: unknown): string | undefined {
   const name = (error as { cause?: { constraint?: string } }).cause?.constraint;
@@ -98,17 +113,7 @@ export const entries = new Hono<{ Variables: Variables }>()
   .get("/", async (c) => {
     const query = range.safeParse(c.req.query());
     if (!query.success) return c.json({ error: "Choose a valid date range." }, 400);
-    const localDate = sql`(${journalEntry.occurredAt} at time zone ${journalEntry.timeZone})::date`;
-    const rows = await db
-      .select(columns)
-      .from(journalEntry)
-      .where(
-        and(
-          eq(journalEntry.userId, c.get("user").id),
-          sql`${localDate} between ${query.data.from}::date and ${query.data.to}::date`,
-        ),
-      )
-      .orderBy(asc(journalEntry.occurredAt));
+    const rows = await entriesInRange(c.get("user").id, query.data.from, query.data.to);
     // Each entry carries its symptoms for the week strip, from the same matcher (decision 13).
     const tagged = rows.map((row) => ({
       ...row,

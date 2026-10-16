@@ -1,16 +1,7 @@
-import type { Page } from "@playwright/test";
-
-import { expect, signUp, test, weekUrl } from "./fixtures";
+import { expect, save, signUp, test, weekUrl } from "./fixtures";
 
 // A fixed zone and a fixed past week, so the results never depend on today's date.
 test.use({ timezoneId: "America/Toronto" });
-
-async function save(page: Page, entry: Record<string, unknown>) {
-  const res = await page.request.post("/api/entries", {
-    data: { timeZone: "America/Toronto", ...entry },
-  });
-  expect(res.status()).toBe(201);
-}
 
 test("shows a week's entries grouped by day, with the same rows on every entry", async ({
   page,

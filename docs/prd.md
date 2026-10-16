@@ -342,7 +342,7 @@ From the stack map, scaffolded with `npx create-better-fullstack@latest` (the ex
 | ORM and migrations | Drizzle |
 | Database | Postgres |
 | Auth | Better-Auth |
-| PDF | **[Default]** `@react-pdf/renderer`, run on the server from the reviewed snapshot |
+| PDF | `pdfkit`, run on the server from the reviewed snapshot (chosen in milestone 2 over the `@react-pdf/renderer` default: it draws text directly, without React and a layout engine on the server) |
 | Lint and format | Biome, with its accessibility, security, and promise rules on |
 | Tests | Vitest for unit tests, Playwright for end-to-end tests in Chrome, Firefox, Safari, and iPhone Safari |
 
