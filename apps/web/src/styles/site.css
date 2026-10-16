@@ -1,6 +1,5 @@
 /* The header and footer on every page (components/site-header.tsx and site-footer.tsx).
-   Same width as the landing page, so the wordmark lines up with its hero. Colors come only from
-   tokens.css. */
+   Colors come only from tokens.css. */
 /* Off screen until focused, then a pill in the top corner. */
 .skip-link {
   position: absolute;
@@ -28,11 +27,22 @@
 
 .site-header,
 .site-footer {
+  /* Full-width bands: stretch over the body's gutters, then put them back as padding. */
+  margin-inline: calc(-1 * var(--gutter-l)) calc(-1 * var(--gutter-r));
+  padding-inline: var(--gutter-l) var(--gutter-r);
+}
+/* Same width as the landing page, so the wordmark lines up with its hero. */
+.site-header-in,
+.site-footer-in {
   max-width: 1120px;
   margin-inline: auto;
   padding-inline: clamp(0px, 5vw - 16px, 40px);
 }
+/* A quiet sage band. Only ink text goes on it: --muted is 4.28:1 on the light sage. */
 .site-header {
+  background: var(--primary-soft);
+}
+.site-header-in {
   padding-block: 20px;
   display: flex;
   flex-wrap: wrap;
@@ -166,15 +176,24 @@
   }
 }
 
-/* Footer: link columns, then the credits in ink at body size and a quiet prototype note. The
-   hairline sits on the inner box, so it spans the same width as the landing's section lines. */
+/* Footer: a dark slate band (industry-standard, and the one dark band the brief allows). It
+   swaps in the footer tokens, so links, focus rings, and hairlines inside follow without
+   per-element colors. */
+.site-footer {
+  background: var(--foot-bg);
+  color-scheme: dark;
+  --ink: var(--foot-ink);
+  --muted: var(--foot-muted);
+  --line: var(--foot-line);
+  --primary: var(--foot-primary);
+  color: var(--ink);
+}
 .site-footer-in {
   display: grid;
   /* Without this the column takes the link grid's width at its max-width, wider than a phone. */
   grid-template-columns: minmax(0, 1fr);
   gap: 32px;
-  padding-block: 40px calc(64px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--line);
+  padding-block: 56px calc(64px + env(safe-area-inset-bottom, 0px));
 }
 .foot-cols {
   display: grid;

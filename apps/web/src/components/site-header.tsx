@@ -40,50 +40,52 @@ export function SiteHeader() {
   return (
     <>
       <header className="site-header">
-        <Link to="/" className="wordmark" activeOptions={{ exact: true }}>
-          Steady
-        </Link>
-        {/* On narrow screens the links sit behind Menu; on wide ones Menu is hidden. */}
-        <div className="nav-wrap" {...menu.root}>
-          <Button className="btn btn-secondary btn-sm menu-btn" {...menu.button}>
-            Menu
-          </Button>
-          <nav
-            id={menu.id}
-            className="site-nav"
-            aria-label="Main"
-            data-open={menu.open || undefined}
-          >
-            {!isPending && (
-              <>
-                <ul className="nav-links">
-                  {data ? <AppLinks /> : <SectionLinks />}
-                  <li>
-                    <HowItsMade />
-                  </li>
-                </ul>
-                <div className="nav-actions">
-                  {data ? (
-                    <Button
-                      className="btn btn-secondary btn-sm"
-                      onPress={() => void signOut(data.user.id)}
-                    >
-                      Sign out
-                    </Button>
-                  ) : (
-                    <>
-                      <Link to="/sign-in" className="btn btn-secondary btn-sm">
-                        Sign in
-                      </Link>
-                      <a href={WAITLIST_HREF} className="btn btn-primary btn-sm">
-                        Join the waitlist
-                      </a>
-                    </>
-                  )}
-                </div>
-              </>
-            )}
-          </nav>
+        <div className="site-header-in">
+          <Link to="/" className="wordmark" activeOptions={{ exact: true }}>
+            Steady
+          </Link>
+          {/* On narrow screens the links sit behind Menu; on wide ones Menu is hidden. */}
+          <div className="nav-wrap" {...menu.root}>
+            <Button className="btn btn-secondary btn-sm menu-btn" {...menu.button}>
+              Menu
+            </Button>
+            <nav
+              id={menu.id}
+              className="site-nav"
+              aria-label="Main"
+              data-open={menu.open || undefined}
+            >
+              {!isPending && (
+                <>
+                  <ul className="nav-links">
+                    {data ? <AppLinks /> : <SectionLinks />}
+                    <li>
+                      <HowItsMade />
+                    </li>
+                  </ul>
+                  <div className="nav-actions">
+                    {data ? (
+                      <Button
+                        className="btn btn-secondary btn-sm"
+                        onPress={() => void signOut(data.user.id)}
+                      >
+                        Sign out
+                      </Button>
+                    ) : (
+                      <>
+                        <Link to="/sign-in" className="btn btn-secondary btn-sm">
+                          Sign in
+                        </Link>
+                        <a href={WAITLIST_HREF} className="btn btn-primary btn-sm">
+                          Join the waitlist
+                        </a>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </nav>
+          </div>
         </div>
       </header>
       {error && (

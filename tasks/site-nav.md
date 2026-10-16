@@ -19,6 +19,7 @@ Reference: ada.cx's header and footer, rebuilt to `docs/design-brief.md` and `ta
 - Phones: the links and CTA fold into a "Menu" button, the same disclosure pattern, and open as a list under the header. No new dependency and no inline style.
 - A "Skip to content" link comes first, since the header now repeats on every page (WCAG 2.4.1).
 - Not sticky: on phones it would take space from the journal and its bottom-sheet entry card.
+- Colors (chosen 2026-10-16): the header is a sage band (`--primary-soft`), the footer a dark slate band (`--foot-*` tokens), both full width. The brief records the footer as its one dark-band exception.
 - Footer: link columns (Steady: the same links as the header for the session; How it's made: Healthcare perspective, Software perspective), the waitlist address as text for visitors without a mail app, then the credits and the prototype note that are on the landing page today.
 
 ## Steps
@@ -48,3 +49,7 @@ By hand: `npm run dev`, open `/` signed out (Waitlist and Sign in), sign in as `
   Cause: `useSession()` in the header and footer refetched the session whenever the window regained focus, and a Playwright click focuses the window.
   With `refetchOnWindowFocus: false` in `apps/web/src/lib/auth-client.ts`, 100 of 100 passed.
   The mechanism inside Firefox is inferred, not confirmed.
+- After the color change, one `npm run ci` run failed two WebKit Undo tests (fake clock, test timeout) while system processes held the load average near 31 and the run took 7.3 minutes instead of 2 to 3.
+  The same Undo tests then passed 35 of 35 in WebKit under that load, and the change touched only CSS and one wrapper `div`.
+  Two full `npm run ci` runs after it passed 273 of 273 each.
+  Not proven to be load; if these tests fail again, look at the fake clock and the 10-second timer first.

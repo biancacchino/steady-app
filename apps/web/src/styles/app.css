@@ -16,8 +16,11 @@ body {
     var(--bg);
   color: var(--ink);
   font: 400 16px / 1.6 var(--sans);
-  /* 16px gutters, wider where a notch or rounded corner needs it (viewport-fit=cover). */
-  padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  /* 16px gutters, wider where a notch or rounded corner needs it (viewport-fit=cover). Named, so
+     the header and footer bands can stretch back over them (site.css). */
+  --gutter-l: max(16px, env(safe-area-inset-left));
+  --gutter-r: max(16px, env(safe-area-inset-right));
+  padding: 0 var(--gutter-r) 0 var(--gutter-l);
   -webkit-font-smoothing: antialiased;
 }
 h1,

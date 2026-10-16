@@ -23,6 +23,7 @@
   max-width: 60ch;
   font-size: 18px;
   line-height: 1.6;
+  text-wrap: pretty;
 }
 .land-actions {
   display: flex;
