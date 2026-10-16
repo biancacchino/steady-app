@@ -8,6 +8,7 @@ import { secureHeaders } from "hono/secure-headers";
 
 import { entries } from "./entries";
 import { dietApi, referralApi, screeningApi } from "./screening-routes";
+import { settings } from "./settings";
 import { summaries } from "./summaries";
 
 export type Variables = { user: typeof auth.$Infer.Session.user };
@@ -75,6 +76,7 @@ app.route("/api/summaries", summaries);
 app.route("/api/screening", screeningApi);
 app.route("/api/diet", dietApi);
 app.route("/api/referral", referralApi);
+app.route("/api/settings", settings);
 
 app.get("/api/me", (c) => {
   const { id, email, name } = c.get("user");
