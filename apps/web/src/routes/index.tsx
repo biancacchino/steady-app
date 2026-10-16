@@ -53,6 +53,8 @@ function Landing() {
               </>
             )}
           </div>
+          {/* The mailto link does nothing without a default mail app, so the address is also shown. */}
+          {!signedIn && <p className="muted">Or email {WAITLIST_EMAIL}</p>}
         </section>
 
         <section className="land-sec" aria-labelledby="why-title">
