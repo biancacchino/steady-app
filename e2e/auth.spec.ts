@@ -3,6 +3,7 @@ import { expect, newUser, test } from "./fixtures";
 test("signing up opens the journal", async ({ page, ip: _ }) => {
   const user = newUser();
   await page.goto("/sign-up");
+  await page.getByLabel("Invite code").fill(user.inviteCode);
   await page.getByLabel("Your name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
@@ -21,19 +22,40 @@ test("an empty sign-up shows every problem at once and focuses the first", async
   await page.goto("/sign-up");
   await page.getByRole("button", { name: "Create account" }).click();
 
+  await expect(page.getByText("Enter your invite code.")).toBeVisible();
   await expect(page.getByText("Enter your name.")).toBeVisible();
   await expect(page.getByText("Enter your email.")).toBeVisible();
   await expect(page.getByText("Enter a password.")).toBeVisible();
   await expect(page.getByText("Confirm that you are 18 or older to continue.")).toBeVisible();
-  await expect(page.getByLabel("Your name")).toBeFocused();
+  await expect(page.getByLabel("Invite code")).toBeFocused();
 
   await page.getByLabel("Your name").fill("Maya");
   await expect(page.getByText("Enter your name.")).toBeHidden();
 });
 
+test("a wrong invite code is refused with a message that says only that", async ({
+  page,
+  ip: _,
+}) => {
+  const user = newUser();
+  await page.goto("/sign-up");
+  await page.getByLabel("Invite code").fill("not-the-code");
+  await page.getByLabel("Your name").fill(user.name);
+  await page.getByLabel("Email").fill(user.email);
+  await page.getByLabel("Password").fill(user.password);
+  await page.getByText("I am 18 or older").click();
+  await page.getByRole("button", { name: "Create account" }).click();
+
+  await expect(page.getByRole("alert")).toHaveText(
+    "That invite code doesn't work. Check it and try again.",
+  );
+  await expect(page).toHaveURL(/\/sign-up$/);
+});
+
 test("sign-up requires the 18 or older box", async ({ page, ip: _ }) => {
   const user = newUser();
   await page.goto("/sign-up");
+  await page.getByLabel("Invite code").fill(user.inviteCode);
   await page.getByLabel("Your name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
@@ -46,7 +68,12 @@ test("sign-up requires the 18 or older box", async ({ page, ip: _ }) => {
 test("the server refuses a sign-up without age confirmation", async ({ request, ip, baseURL }) => {
   const user = newUser();
   const res = await request.post("/api/auth/sign-up/email", {
-    data: { name: user.name, email: user.email, password: user.password },
+    data: {
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      inviteCode: user.inviteCode,
+    },
     headers: { "x-forwarded-for": ip, origin: baseURL ?? "" },
   });
   expect(res.status()).toBe(400);
@@ -55,6 +82,7 @@ test("the server refuses a sign-up without age confirmation", async ({ request, 
 test("signing out returns to sign in and locks the journal", async ({ page, ip: _ }) => {
   const user = newUser();
   await page.goto("/sign-up");
+  await page.getByLabel("Invite code").fill(user.inviteCode);
   await page.getByLabel("Your name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
@@ -71,6 +99,7 @@ test("signing out returns to sign in and locks the journal", async ({ page, ip: 
 test("a failed sign-out says so and stays on the journal", async ({ page, ip: _ }) => {
   const user = newUser();
   await page.goto("/sign-up");
+  await page.getByLabel("Invite code").fill(user.inviteCode);
   await page.getByLabel("Your name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);

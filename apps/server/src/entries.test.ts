@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { auth } from "@steady/auth";
 import { db } from "@steady/db";
 import { user } from "@steady/db/schema/index";
+import { env } from "@steady/env/server";
 import { inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -18,10 +19,14 @@ let sam: string;
 async function signUp(name: string) {
   const email = `${name.toLowerCase()}-${randomUUID()}@example.com`;
   emails.push(email);
-  const res = await auth.api.signUpEmail({
-    body: { name, email, password: "Password123!", ageConfirmedAt: new Date() },
-    asResponse: true,
-  });
+  const body = {
+    name,
+    email,
+    password: "Password123!",
+    ageConfirmedAt: new Date(),
+    inviteCode: env.INVITE_CODE,
+  };
+  const res = await auth.api.signUpEmail({ body, asResponse: true });
   const cookie = res.headers.getSetCookie()[0]?.split(";")[0];
   if (!cookie) throw new Error("Sign-up returned no session cookie.");
   return cookie;

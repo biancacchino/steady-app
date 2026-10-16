@@ -16,6 +16,7 @@ export const Route = createFileRoute("/sign-up")({
 
 function SignUp() {
   const navigate = useNavigate();
+  const [inviteCode, setInviteCode] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,16 +32,20 @@ function SignUp() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    const found = checkSignUp({ name, email, password, adult });
+    const found = checkSignUp({ inviteCode, name, email, password, adult });
     setErrors(found);
     if (Object.keys(found).length) return focusFirstError(e.currentTarget, found);
     setPending(true);
-    const { error } = await authClient.signUp.email({
+    // inviteCode is checked on the server before anything else (packages/auth). Better-Auth's
+    // types do not know it, so the body is built first; spaces from a pasted code are trimmed.
+    const body = {
       name,
       email,
       password,
       ageConfirmedAt: new Date(),
-    });
+      inviteCode: inviteCode.trim(),
+    };
+    const { error } = await authClient.signUp.email(body);
     setPending(false);
     if (error) {
       setError(
@@ -66,6 +71,15 @@ function SignUp() {
           validationBehavior="aria"
         >
           <FormError message={error} />
+          <Field
+            label="Invite code"
+            name="inviteCode"
+            autoComplete="off"
+            isRequired
+            hint="Steady is invite only for now. The person who invited you has the code."
+            value={inviteCode}
+            onChange={edit("inviteCode", setInviteCode)}
+          />
           <Field
             label="Your name"
             name="name"

@@ -19,6 +19,9 @@ export const env = createEnv({
           ["localhost", "127.0.0.1"].includes(new URL(url).hostname),
         "BETTER_AUTH_URL must use https in production.",
       ),
+    // Sign-up is invite only: the shared code people need to create an account.
+    // At least 16 characters, so it cannot be guessed within the sign-up rate limit.
+    INVITE_CODE: z.string().min(16),
     PORT: z.coerce.number().int().default(3000),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   },

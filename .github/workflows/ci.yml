@@ -34,6 +34,8 @@ jobs:
           cache: npm
       - name: Create a throwaway auth secret for this run
         run: echo "BETTER_AUTH_SECRET=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+      - name: Create a throwaway invite code for this run
+        run: echo "INVITE_CODE=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
       - run: npm ci
       - name: Format
         run: npm run format:check
