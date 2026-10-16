@@ -55,6 +55,8 @@ test("signed out, Join the waitlist opens an email to a real address", async ({ 
   const href = await page.getByRole("link", { name: "Join the waitlist" }).getAttribute("href");
   const email = "steadyappjournal@gmail.com";
   expect(href).toBe(`mailto:${email}?subject=Steady%20waitlist`);
+  // Without a default mail app the link does nothing, so the address is also shown as text.
+  await expect(page.getByText(`Or email ${email}`)).toBeVisible();
 });
 
 test("signed in, the landing page offers Open your journal instead", async ({
@@ -72,6 +74,7 @@ test("signed in, the landing page offers Open your journal instead", async ({
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("link", { name: "Join the waitlist" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Sign in" })).toHaveCount(0);
+  await expect(page.getByText("steadyappjournal@gmail.com")).toHaveCount(0);
   await page.getByRole("link", { name: "Open your journal" }).click();
   await expect(page).toHaveURL(/\/journal$/);
   await expect(page.getByRole("button", { name: "New entry" })).toBeVisible();
