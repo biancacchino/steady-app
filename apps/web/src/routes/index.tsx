@@ -26,7 +26,7 @@ function Landing() {
           </h1>
           <div className="lede">
             <p>
-              Steady is an early version of an IBS app. It's built so cutting foods is never the
+              Steady is an app made for people with IBS. It's built so cutting foods is never the
               first step, and so your provider gets a clear picture of what changed.
             </p>
             <p>
@@ -129,7 +129,7 @@ function Landing() {
           <div className="sec-head">
             <h2 id="source-title">Where this is coming from</h2>
             <p className="muted">
-              Steady started with research by Beatrice Javier, a nurse practitioner. Each design
+              Steady was started by Beatrice Javier, a critical care nurse (CCRN). Each design
               choice traces back to her sources.
             </p>
           </div>
@@ -224,7 +224,6 @@ function SampleEntry() {
           </div>
         </div>
       </div>
-      <figcaption className="small muted">A made-up entry, shown for this page only.</figcaption>
     </figure>
   );
 }

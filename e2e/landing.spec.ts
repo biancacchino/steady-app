@@ -43,7 +43,6 @@ test("the sample entry uses the journal's labeled rows and is not interactive", 
     "Bloating in the afternoon · Severity medium",
     "None noted",
   ]);
-  await expect(sample.getByText("A made-up entry, shown for this page only.")).toBeVisible();
   await expect(sample.getByRole("button")).toHaveCount(0);
   await expect(sample.getByRole("link")).toHaveCount(0);
 });
