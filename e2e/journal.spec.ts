@@ -1,4 +1,4 @@
-import { expect, save, signUp, test, weekUrl } from "./fixtures";
+import { expect, save, signUp, siteNav, test, weekUrl } from "./fixtures";
 
 // A fixed zone and a fixed past week, so the results never depend on today's date.
 test.use({ timezoneId: "America/Toronto" });
@@ -157,7 +157,7 @@ test("closing keeps a draft for this user, and signing out removes it", async ({
   await expect(page.getByLabel("Symptoms")).toHaveValue("bad cramps");
   await page.getByRole("button", { name: "Cancel" }).click();
 
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await (await siteNav(page)).getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);

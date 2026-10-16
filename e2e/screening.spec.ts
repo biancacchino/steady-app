@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 
-import { expect, signUp, test } from "./fixtures";
+import { expect, signUp, siteNav, test } from "./fixtures";
 
 async function answer(page: Page, label: string, times: number) {
   for (let i = 0; i < times; i++) {
@@ -24,7 +24,7 @@ test("before the questions, the diet plan asks for them and shows no plan", asyn
   ip: _,
 }) => {
   await signUp(page);
-  await page.getByRole("link", { name: "Diet plan" }).click();
+  await (await siteNav(page)).getByRole("link", { name: "Diet plan" }).click();
   await expect(page.getByRole("heading", { name: "A few questions first" })).toBeVisible();
   await expect(page.getByText("Placeholder content")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Start the plan" })).toHaveCount(0);
@@ -87,7 +87,7 @@ test("answering at or above the threshold hides the diet plan and shows who can 
   await expect(page.getByRole("heading", { name: "People who can help" })).toBeVisible();
   await expect(page.getByText(/988/)).toBeVisible();
   // The journal still works.
-  await page.getByRole("link", { name: "Back to journal" }).click();
+  await (await siteNav(page)).getByRole("link", { name: "Journal" }).click();
   await expect(page).toHaveURL(/\/journal/);
 });
 
@@ -96,7 +96,7 @@ test("no horizontal scroll and 44px targets on the question screen", async ({ pa
   await page.goto("/screening");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   for (const target of await page
-    .locator("button:visible, a:visible:not(.wordmark), .choice")
+    .locator("main button:visible, main a:visible, main .choice")
     .all()) {
     const box = await target.boundingBox();
     expect(Math.round(box?.height ?? 0)).toBeGreaterThanOrEqual(44);

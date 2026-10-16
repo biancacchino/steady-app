@@ -78,3 +78,18 @@ export async function signUp(page: Page) {
   await expect(page).toHaveURL(/\/journal$/, { timeout: 15_000 });
   return user;
 }
+
+/**
+ * The site header, with its links showing. On narrow screens they sit behind the Menu button,
+ * so it is opened first.
+ */
+export async function siteNav(page: Page) {
+  const header = page.getByRole("banner");
+  // isVisible does not wait, so wait for the header to render first.
+  await header.getByRole("link", { name: "Steady", exact: true }).waitFor();
+  const menu = header.getByRole("button", { name: "Menu" });
+  if ((await menu.isVisible()) && (await menu.getAttribute("aria-expanded")) !== "true") {
+    await menu.click();
+  }
+  return header;
+}

@@ -1,7 +1,6 @@
 import {
   createFileRoute,
   type ErrorComponentProps,
-  Link,
   redirect,
   useNavigate,
   useRouter,
@@ -79,46 +78,38 @@ function Summary() {
   }
 
   return (
-    <>
-      <header className="site-head">
-        <span className="wordmark">Steady</span>
-        <Link to="/journal" className="btn btn-secondary btn-sm">
-          Back to journal
-        </Link>
-      </header>
-      <main className="page">
-        <section className="sum-setup" aria-labelledby="setup-title">
-          <h1 id="setup-title">Get ready for your appointment</h1>
-          <div className="when">
-            <TextField className="field" type="date" value={from} onChange={(v) => setRange(v, to)}>
-              <Label className="label">From</Label>
-              <Input className="input" max={to} />
-            </TextField>
-            <TextField className="field" type="date" value={to} onChange={(v) => setRange(from, v)}>
-              <Label className="label">To</Label>
-              <Input className="input" min={from} max={data.today} />
-            </TextField>
-          </div>
-          <div className="sum-inputs">
-            <TextField className="field" value={provider} onChange={setProvider} maxLength={100}>
-              <Label className="label">For (optional)</Label>
-              <Input className="input" />
-            </TextField>
-            <TextField className="field" type="date" value={appointment} onChange={setAppointment}>
-              <Label className="label">Appointment (optional)</Label>
-              <Input className="input" />
-            </TextField>
-          </div>
-        </section>
-        {/* A new range starts a new summary, so the entries left out and the questions reset. */}
-        <Sheet
-          key={`${data.from}/${data.to}`}
-          preview={data}
-          provider={provider}
-          appointment={appointment}
-        />
-      </main>
-    </>
+    <main className="page">
+      <section className="sum-setup" aria-labelledby="setup-title">
+        <h1 id="setup-title">Get ready for your appointment</h1>
+        <div className="when">
+          <TextField className="field" type="date" value={from} onChange={(v) => setRange(v, to)}>
+            <Label className="label">From</Label>
+            <Input className="input" max={to} />
+          </TextField>
+          <TextField className="field" type="date" value={to} onChange={(v) => setRange(from, v)}>
+            <Label className="label">To</Label>
+            <Input className="input" min={from} max={data.today} />
+          </TextField>
+        </div>
+        <div className="sum-inputs">
+          <TextField className="field" value={provider} onChange={setProvider} maxLength={100}>
+            <Label className="label">For (optional)</Label>
+            <Input className="input" />
+          </TextField>
+          <TextField className="field" type="date" value={appointment} onChange={setAppointment}>
+            <Label className="label">Appointment (optional)</Label>
+            <Input className="input" />
+          </TextField>
+        </div>
+      </section>
+      {/* A new range starts a new summary, so the entries left out and the questions reset. */}
+      <Sheet
+        key={`${data.from}/${data.to}`}
+        preview={data}
+        provider={provider}
+        appointment={appointment}
+      />
+    </main>
   );
 }
 

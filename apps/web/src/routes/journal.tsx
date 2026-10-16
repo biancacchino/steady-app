@@ -1,7 +1,6 @@
 import {
   createFileRoute,
   type ErrorComponentProps,
-  Link,
   redirect,
   useNavigate,
   useRouter,
@@ -11,9 +10,7 @@ import { Button, ToggleButton } from "react-aria-components";
 
 import { type CardEntry, type CardTarget, EntryCard } from "@/components/entry-card";
 import { EntryFields } from "@/components/entry-fields";
-import { FormError } from "@/components/fields";
-import { authClient, getSession } from "@/lib/auth-client";
-import { clearDraft } from "@/lib/draft";
+import { getSession } from "@/lib/auth-client";
 import {
   addDays,
   daySymptom,
@@ -191,7 +188,6 @@ function Journal() {
 
   return (
     <>
-      <SiteHead />
       <main className="page">
         <section className="journal" aria-labelledby="week-title">
           <div className="journal-head">
@@ -400,68 +396,16 @@ function EntryRow({
   );
 }
 
-function SiteHead() {
-  const { userId } = Route.useRouteContext();
-  const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
-
-  // Leave only once the server has ended the session. Otherwise the sign-in page would see
-  // the session and send the user straight back here with no explanation.
-  async function signOut() {
-    setError(null);
-    try {
-      const { error } = await authClient.signOut();
-      if (error) throw error;
-    } catch {
-      setError("Sign-out did not work. Try again.");
-      return;
-    }
-    // An unsaved draft must not outlive the session on a shared device (decision 14).
-    clearDraft(userId);
-    await navigate({ to: "/sign-in" });
-  }
-
-  return (
-    <>
-      <header className="site-head">
-        <span className="wordmark">Steady</span>
-        <div className="head-actions">
-          <Link to="/summary" className="btn btn-secondary btn-sm">
-            Appointment summary
-          </Link>
-          <Link to="/diet" className="btn btn-secondary btn-sm">
-            Diet plan
-          </Link>
-          <Link to="/account" className="btn btn-secondary btn-sm">
-            Account
-          </Link>
-          <Button className="btn btn-secondary btn-sm" onPress={() => void signOut()}>
-            Sign out
-          </Button>
-        </div>
-      </header>
-      {error && (
-        <div className="site-error">
-          <FormError message={error} />
-        </div>
-      )}
-    </>
-  );
-}
-
 function LoadError(_: ErrorComponentProps) {
   const router = useRouter();
   return (
-    <>
-      <SiteHead />
-      <main className="page">
-        <div className="panel">
-          <p>Your journal could not be loaded.</p>
-          <Button className="btn btn-secondary" onPress={() => void router.invalidate()}>
-            Try again
-          </Button>
-        </div>
-      </main>
-    </>
+    <main className="page">
+      <div className="panel">
+        <p>Your journal could not be loaded.</p>
+        <Button className="btn btn-secondary" onPress={() => void router.invalidate()}>
+          Try again
+        </Button>
+      </div>
+    </main>
   );
 }

@@ -32,6 +32,7 @@ npm run dev                                    # web on http://localhost:5173, A
 
 Open http://localhost:5173 for the landing page, then choose Sign in and use the demo account: `user@example.com` / `Password123!`.
 The landing page at `/` is open to everyone; its text lives in `apps/web/src/routes/index.tsx`.
+Every page shares one header and footer (`apps/web/src/components/site-header.tsx` and `site-footer.tsx`), with "How it's made" linking the healthcare and software pages.
 Sign-up is invite only: a new account needs the `INVITE_CODE` from `apps/server/.env`.
 The seed script only runs against a database on this machine, so this account never reaches a real deployment.
 In development, Vite forwards `/api` to the Hono server, so the browser only ever talks to one origin.

@@ -48,15 +48,6 @@ a {
 }
 
 /* Layout */
-.site-head {
-  max-width: 720px;
-  margin: 0 auto;
-  padding-block: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
 .wordmark {
   font: 400 26px / 1 var(--display);
   letter-spacing: -0.02em;
@@ -95,12 +86,6 @@ a {
 .details dd {
   margin: 0;
   overflow-wrap: anywhere;
-}
-.head-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
 }
 
 /* Buttons: 44px tall targets */

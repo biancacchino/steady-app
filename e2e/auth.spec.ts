@@ -1,4 +1,4 @@
-import { expect, newUser, signUp, test } from "./fixtures";
+import { expect, newUser, signUp, siteNav, test } from "./fixtures";
 
 test("signing up opens the journal", async ({ page, ip: _ }) => {
   await signUp(page);
@@ -73,7 +73,7 @@ test("the server refuses a sign-up without age confirmation", async ({ request, 
 test("signing out returns to sign in and locks the journal", async ({ page, ip: _ }) => {
   await signUp(page);
 
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await (await siteNav(page)).getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
   await page.goto("/journal");
   await expect(page).toHaveURL(/\/sign-in$/);
@@ -83,7 +83,7 @@ test("a failed sign-out says so and stays on the journal", async ({ page, ip: _ 
   await signUp(page);
 
   await page.route("**/api/auth/sign-out", (route) => route.abort());
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await (await siteNav(page)).getByRole("button", { name: "Sign out" }).click();
   await expect(page.getByRole("alert")).toHaveText("Sign-out did not work. Try again.");
   await expect(page).toHaveURL(/\/journal$/);
 });
@@ -102,6 +102,7 @@ test("sign in works with the keyboard alone, with a visible focus ring", async (
   page,
   ip,
   baseURL,
+  browserName,
 }) => {
   const user = newUser();
   const created = await page.request.post("/api/auth/sign-up/email", {
@@ -113,6 +114,11 @@ test("sign in works with the keyboard alone, with a visible focus ring", async (
 
   await page.goto("/sign-in");
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+  // The first stop is the skip link, which jumps past the header to the form. Safari's Tab skips
+  // links unless a setting is on; Option+Tab reaches them.
+  await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
+  await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
+  await page.keyboard.press("Enter");
   await page.keyboard.press("Tab");
   await expect(page.getByLabel("Email")).toBeFocused();
   const outline = await page

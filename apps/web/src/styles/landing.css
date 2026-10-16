@@ -1,14 +1,9 @@
 /* Landing page at /, following docs/design-brief.md: left-aligned, generous section padding,
    hairlines between sections, no cards. Colors come only from tokens.css. */
-.land-head,
-.land,
-.land-foot {
+.land {
   max-width: 1120px;
   margin-inline: auto;
   padding-inline: clamp(0px, 5vw - 16px, 40px);
-}
-.land-head {
-  padding-block: 20px;
 }
 
 .hero {
@@ -92,23 +87,6 @@
     top: 40px;
     align-self: start;
   }
-}
-
-/* The hairline sits on the inner box, so it spans the same width as the section hairlines.
-   The credits are body size in ink, so they are easy to find; the prototype note stays quiet. */
-.land-foot-in {
-  display: grid;
-  gap: 16px;
-  padding-block: 40px calc(64px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--line);
-}
-.credits {
-  display: grid;
-  gap: 4px;
-}
-/* A name never breaks across lines. */
-.credits .name {
-  white-space: nowrap;
 }
 
 /* Sample entry. The entry itself uses the journal's styles in app.css; only the frame is here. */
