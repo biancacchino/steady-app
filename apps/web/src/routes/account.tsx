@@ -3,7 +3,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Button, Form } from "react-aria-components";
 
 import { Field, FormError, focusFirstError } from "@/components/fields";
-import { getSession } from "@/lib/auth-client";
+import { authClient, getSession } from "@/lib/auth-client";
 import { clearDraft } from "@/lib/draft";
 import type { Errors } from "@/lib/validate";
 
@@ -26,20 +26,6 @@ function Account() {
 
   return (
     <>
-      <header className="site-head">
-        {deleted ? (
-          <span className="wordmark">Steady</span>
-        ) : (
-          <>
-            <Link to="/journal" className="wordmark">
-              Steady
-            </Link>
-            <Link to="/journal" className="btn btn-secondary btn-sm">
-              Back to journal
-            </Link>
-          </>
-        )}
-      </header>
       {deleted ? (
         <Deleted />
       ) : (
@@ -60,6 +46,9 @@ function Account() {
             onDeleted={() => {
               // An unsaved draft must not outlive the account on this device (decision 14).
               clearDraft(user.id);
+              // The delete was a plain fetch, so tell the auth client to reload the session.
+              // That swaps the header to its signed-out links.
+              authClient.$store.notify("$sessionSignal");
               setDeleted(true);
             }}
           />

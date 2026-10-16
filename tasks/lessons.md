@@ -26,3 +26,6 @@
 - Read a check's exit code, not the last lines of its output.
   Biome prints its errors first and a plain summary last, so `| tail -2` showed a clean-looking summary while 5 `noSecrets` errors went unreported for two steps.
   Run each check as `cmd >/dev/null 2>&1; echo "exit $?"`, then read the full output only when one fails.
+- Never call a test failure a flake because a rerun passed.
+  The header's session refetch hung Firefox clicks about 3% of the time; a rerun of the four failing account tests passed, and they got called load flakes.
+  Compare against `main` with `--repeat-each` (another worktree, `E2E_PORT`), find the cause, then pass the full `npm run ci` more than once.

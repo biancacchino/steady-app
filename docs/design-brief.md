@@ -81,6 +81,9 @@ It should feel like a well-kept notebook a clinician would respect, not a wellne
 - **Dark hero sections.**
   All three sites open or alternate with near-black bands.
   Steady users may open the app while anxious or unwell, so the app stays light-first with a proper dark mode, not dramatic contrast bands.
+  One exception, chosen 2026-10-16: the site footer is a dark slate band (`--foot-bg`), the common pattern for footers.
+  It sits after the content, so nobody reads health data against it.
+  The header is a quiet sage band (`--primary-soft`), not a dark one, because it is on every screen.
 - **Coral as a signal color.**
   Cohere's `#ff7759` on white is 2.61:1, which fails WCAG for text.
   Ada's terracotta `#ca6a42` (sampled) on its selected tab has the same problem of meaning.
@@ -122,6 +125,20 @@ The references use commercial fonts (Exposure, Cursor Gothic, Unica77) that we c
 | `--on-primary` | `#ffffff` | | Text on primary, 7.75:1 |
 
 Cohere's muted `#73738a` measures 4.42:1 on `#fafafa`, just under the 4.5:1 body-text minimum, so Steady darkens it to `#6b6b80`.
+
+The header band is `--primary-soft` (`#e3ebe7`): `--ink` is 13.27:1 and `--primary` 6.38:1 on it, but `--muted` is only 4.28:1, so only ink text goes in the header.
+
+### Color (footer)
+
+The footer is a dark slate band in both modes. Inside it, `--ink`, `--muted`, `--line`, and `--primary` are swapped for these, so links and focus rings follow.
+
+| Token | Light | Dark | Note |
+|---|---|---|---|
+| `--foot-bg` | `#16242a` | `#0e1216` | Ada slate; in dark mode a step darker (Ada's card shade) so it still reads as a band |
+| `--foot-ink` | `#fafafa` | same | 15.24:1 / 18.02:1 |
+| `--foot-muted` | `#97a3a6` | same | 6.14:1 / 7.26:1 |
+| `--foot-line` | `rgb(255 255 255 / 0.12)` | same | |
+| `--foot-primary` | `#8fbe8e` | same | links and focus, 7.52:1 / 8.89:1 |
 
 ### Color (dark)
 

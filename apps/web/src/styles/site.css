@@ -1,0 +1,231 @@
+/* The header and footer on every page (components/site-header.tsx and site-footer.tsx).
+   Colors come only from tokens.css. */
+/* Off screen until focused, then a pill in the top corner. */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  z-index: 20;
+  transform: translateY(-200%);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  background: var(--primary);
+  color: var(--on-primary);
+  font: 500 15px / 1 var(--sans);
+  text-decoration: none;
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+/* The skip link's target takes focus from a script-free jump, not from Tab, so no ring. */
+#content:focus {
+  outline: none;
+}
+
+.site-header,
+.site-footer {
+  /* Full-width bands: stretch over the body's gutters, then put them back as padding. */
+  margin-inline: calc(-1 * var(--gutter-l)) calc(-1 * var(--gutter-r));
+  padding-inline: var(--gutter-l) var(--gutter-r);
+}
+/* Same width as the landing page, so the wordmark lines up with its hero. */
+.site-header-in,
+.site-footer-in {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: clamp(0px, 5vw - 16px, 40px);
+}
+/* A quiet sage band. Only ink text goes on it: --muted is 4.28:1 on the light sage. */
+.site-header {
+  background: var(--primary-soft);
+}
+.site-header-in {
+  padding-block: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+/* A 44px target, though the type is 26px. */
+.site-header .wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+/* The wrapper only groups Menu with its list for Esc and outside presses; it adds no box, so
+   the button and list lay out as the header's own children. */
+.nav-wrap {
+  display: contents;
+}
+.site-nav,
+.nav-links,
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.site-nav {
+  gap: 24px;
+}
+.nav-actions {
+  flex-wrap: wrap;
+}
+.nav-links,
+.made-list,
+.foot-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 500 15px / 1.2 var(--sans);
+  text-decoration: none;
+  text-underline-offset: 6px;
+  cursor: pointer;
+}
+/* The current page is underlined, so it never depends on color alone. */
+.nav-link:hover,
+.nav-link[data-hovered] {
+  text-decoration: underline;
+}
+.nav-link[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* How it's made: a list under its button. */
+.made {
+  position: relative;
+}
+.chevron {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+.made-btn[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+.made-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10;
+  min-width: 15rem;
+  padding: 8px;
+  display: grid;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+}
+.made-list .nav-link {
+  width: 100%;
+}
+
+.menu-btn {
+  display: none;
+}
+
+/* Narrow screens: Menu shows the links as a full-width list under the header row. 960px is
+   where the signed-in links and Sign out stop fitting on one row. */
+@media (max-width: 959px) {
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+  }
+  .site-nav {
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding-block: 8px 4px;
+    border-top: 1px solid var(--line);
+  }
+  .site-nav:not([data-open]) {
+    display: none;
+  }
+  .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .nav-link {
+    width: 100%;
+    padding-inline: 0;
+  }
+  /* Inside Menu the list opens in place, indented, instead of floating. */
+  .made-list {
+    position: static;
+    min-width: 0;
+    padding: 0 0 0 16px;
+    background: none;
+    border: 0;
+  }
+}
+
+/* Footer: a dark slate band (industry-standard, and the one dark band the brief allows). It
+   swaps in the footer tokens, so links, focus rings, and hairlines inside follow without
+   per-element colors. */
+.site-footer {
+  background: var(--foot-bg);
+  color-scheme: dark;
+  --ink: var(--foot-ink);
+  --muted: var(--foot-muted);
+  --line: var(--foot-line);
+  --primary: var(--foot-primary);
+  color: var(--ink);
+}
+.site-footer-in {
+  display: grid;
+  /* Without this the column takes the link grid's width at its max-width, wider than a phone. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  padding-block: 56px calc(64px + env(safe-area-inset-bottom, 0px));
+}
+.foot-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 32px;
+  max-width: 44rem;
+}
+.foot-cols nav {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+}
+.foot-title {
+  font: 500 16px / 1.4 var(--sans);
+}
+.foot-links .nav-link {
+  padding-inline: 0;
+  color: var(--muted);
+  font-weight: 400;
+}
+.foot-links .nav-link:hover,
+.foot-links .nav-link[aria-current="page"] {
+  color: var(--ink);
+}
+/* No gap: each line is already 44px tall around its link. */
+.credits {
+  display: grid;
+}
+/* A name never breaks across lines, and as a link it is a 44px target. */
+.credits .name {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  white-space: nowrap;
+}

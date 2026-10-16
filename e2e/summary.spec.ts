@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 
-import { expect, save, signUp, test } from "./fixtures";
+import { expect, save, signUp, siteNav, test } from "./fixtures";
 
 const RANGE = "/summary?from=2026-10-01&to=2026-10-10";
 
@@ -110,7 +110,7 @@ for (const width of [320, 1280]) {
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow).toBe(0);
-    const targets = page.locator(".sheet button, .sheet .incl, .sheet textarea, .site-head a");
+    const targets = page.locator(".sheet button, .sheet .incl, .sheet textarea");
     for (const target of await targets.all()) {
       const box = await target.boundingBox();
       // Rounded, because Firefox and 3x screens can report 44px as 43.99999.
@@ -121,7 +121,7 @@ for (const width of [320, 1280]) {
 
 test("the journal links to the summary", async ({ page, ip: _ }) => {
   await signUp(page);
-  await page.getByRole("link", { name: "Appointment summary" }).click();
+  await (await siteNav(page)).getByRole("link", { name: "Appointment summary" }).click();
   await expect(page).toHaveURL(/\/summary/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Get ready for your appointment",

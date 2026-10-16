@@ -18,6 +18,7 @@ import { Route as ScreeningRouteImport } from './routes/screening'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SummaryRouteImport } from './routes/summary'
+import { Route as AboutHealthcareRouteImport } from './routes/about.healthcare'
 import { Route as AboutSoftwareRouteImport } from './routes/about.software'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,6 +66,11 @@ const SummaryRoute = SummaryRouteImport.update({
   path: '/summary',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutHealthcareRoute = AboutHealthcareRouteImport.update({
+  id: '/about/healthcare',
+  path: '/about/healthcare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutSoftwareRoute = AboutSoftwareRouteImport.update({
   id: '/about/software',
   path: '/about/software',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/about/healthcare': typeof AboutHealthcareRoute
   '/about/software': typeof AboutSoftwareRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/about/healthcare': typeof AboutHealthcareRoute
   '/about/software': typeof AboutSoftwareRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/about/healthcare': typeof AboutHealthcareRoute
   '/about/software': typeof AboutSoftwareRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/summary'
+    | '/about/healthcare'
     | '/about/software'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/summary'
+    | '/about/healthcare'
     | '/about/software'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/summary'
+    | '/about/healthcare'
     | '/about/software'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SummaryRoute: typeof SummaryRoute
+  AboutHealthcareRoute: typeof AboutHealthcareRoute
   AboutSoftwareRoute: typeof AboutSoftwareRoute
 }
 
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about/healthcare': {
+      id: '/about/healthcare'
+      path: '/about/healthcare'
+      fullPath: '/about/healthcare'
+      preLoaderRoute: typeof AboutHealthcareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about/software': {
       id: '/about/software'
       path: '/about/software'
@@ -245,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SummaryRoute: SummaryRoute,
+  AboutHealthcareRoute: AboutHealthcareRoute,
   AboutSoftwareRoute: AboutSoftwareRoute,
 }
 export const routeTree = rootRouteImport

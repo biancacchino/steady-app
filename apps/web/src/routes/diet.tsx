@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Button } from "react-aria-components";
 
 import { FormError } from "@/components/fields";
-import { PageHead } from "@/components/page-head";
 import { getSession } from "@/lib/auth-client";
 import { longDate } from "@/lib/dates";
 
@@ -40,12 +39,9 @@ export const Route = createFileRoute("/diet")({
 function DietPage() {
   const data = Route.useLoaderData();
   return (
-    <>
-      <PageHead />
-      <main className="page">
-        {data.kind === "plan" ? <Plan diet={data.diet} /> : <Locked status={data.status} />}
-      </main>
-    </>
+    <main className="page">
+      {data.kind === "plan" ? <Plan diet={data.diet} /> : <Locked status={data.status} />}
+    </main>
   );
 }
 

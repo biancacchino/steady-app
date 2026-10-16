@@ -1,4 +1,4 @@
-import { expect, signUp, test } from "./fixtures";
+import { expect, signUp, siteNav, test } from "./fixtures";
 
 test("signed out, the account page sends you to sign in", async ({ page, ip: _ }) => {
   await page.goto("/account");
@@ -15,7 +15,7 @@ test("deleting the account removes it and its journal, and frees the email", asy
   });
   expect(created.status()).toBe(201);
 
-  await page.getByRole("link", { name: "Account" }).click();
+  await (await siteNav(page)).getByRole("link", { name: "Account" }).click();
   await expect(page).toHaveURL(/\/account$/);
   await expect(page).toHaveTitle("Account - Steady");
   await expect(page.getByText(user.email)).toBeVisible();

@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Radio, RadioGroup } from "react-aria-components";
 
 import { FormError } from "@/components/fields";
-import { PageHead } from "@/components/page-head";
 import { getSession } from "@/lib/auth-client";
 import { longDate } from "@/lib/dates";
 
@@ -37,18 +36,15 @@ function Screening() {
   const [outcome, setOutcome] = useState<Outcome | null>(null);
 
   return (
-    <>
-      <PageHead />
-      <main className="page">
-        {outcome ? (
-          <Outcome outcome={outcome} />
-        ) : status.canTake && status.instrument ? (
-          <Flow instrument={status.instrument} onDone={setOutcome} />
-        ) : (
-          <Locked retakeAt={status.retakeAt} />
-        )}
-      </main>
-    </>
+    <main className="page">
+      {outcome ? (
+        <Outcome outcome={outcome} />
+      ) : status.canTake && status.instrument ? (
+        <Flow instrument={status.instrument} onDone={setOutcome} />
+      ) : (
+        <Locked retakeAt={status.retakeAt} />
+      )}
+    </main>
   );
 }
 
