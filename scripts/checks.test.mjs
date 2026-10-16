@@ -74,3 +74,11 @@ test("tone: ignores code names and comments", () => {
   `;
   assert.deepEqual(findToneIssues(src), []);
 });
+
+test("bundle: finds diet content in a bundle and passes a clean one", async () => {
+  const { contentStrings, leaks } = await import("./check-bundle.mjs");
+  const strings = contentStrings({ a: "Short", b: ["A phrase that is long enough to count"] });
+  assert.deepEqual(strings, ["A phrase that is long enough to count"]);
+  assert.deepEqual(leaks(strings, "x();A phrase that is long enough to count;y()"), strings);
+  assert.deepEqual(leaks(strings, "const unrelated = 1;"), []);
+});

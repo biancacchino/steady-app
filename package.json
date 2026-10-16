@@ -20,6 +20,7 @@
     "test": "npm run test --workspace server && npm run test --workspace web && node --test \"scripts/*.test.mjs\"",
     "e2e": "playwright test",
     "audit": "npm audit --audit-level=high",
+    "check:bundle": "node scripts/check-bundle.mjs apps/web/dist",
     "check:tone": "node scripts/check-tone.mjs apps/web/src apps/server/src packages/auth/src",
     "db:start": "npm run db:start --workspace @steady/db",
     "db:stop": "npm run db:stop --workspace @steady/db",
@@ -27,7 +28,7 @@
     "db:migrate": "npm run db:migrate --workspace @steady/db",
     "db:seed": "npm run seed --workspace server",
     "db:studio": "npm run db:studio --workspace @steady/db",
-    "ci": "npm run format:check && npm run lint && npm run check-types && npm run check:tone && npm test && npm run build && npm run audit && npm run e2e"
+    "ci": "npm run format:check && npm run lint && npm run check-types && npm run check:tone && npm test && npm run build && npm run check:bundle && npm run audit && npm run e2e"
   },
   "devDependencies": {
     "@steady/config": "*",

@@ -72,3 +72,55 @@ test("the account page fits a 320px screen with 44px targets", async ({ page, ip
     expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
   }
 });
+
+test("the care team contact is saved, used on the referral page, and can be removed", async ({
+  page,
+  ip: _,
+}) => {
+  await signUp(page);
+  await page.goto("/account");
+  const field = page.getByLabel("Email address or link");
+  await field.fill("javascript:alert(1)");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(
+    page.getByText("Enter an email address or a link that starts with https://."),
+  ).toBeVisible();
+
+  await field.fill("dr.osei@clinic.example");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Saved." })).toBeVisible();
+
+  await page.goto("/referral");
+  await expect(page.getByRole("link", { name: "Message your care team" })).toHaveAttribute(
+    "href",
+    "mailto:dr.osei@clinic.example",
+  );
+
+  await page.goto("/account");
+  await expect(field).toHaveValue("dr.osei@clinic.example");
+  await field.fill("");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Removed." })).toBeVisible();
+  await page.goto("/referral");
+  await expect(page.getByRole("link", { name: "Add your care team's contact" })).toBeVisible();
+});
+
+test("Download my data saves one JSON file with the user's entries", async ({ page, ip: _ }) => {
+  const user = await signUp(page);
+  await page.request.post("/api/entries", {
+    data: { occurredAt: "2026-10-13T16:30:00Z", timeZone: "America/Toronto", food: "Toast" },
+  });
+  await page.goto("/account");
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download my data" }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/^steady-export-\d{4}-\d{2}-\d{2}\.json$/);
+  const { createReadStream } = await import("node:fs");
+  const chunks: Buffer[] = [];
+  for await (const chunk of createReadStream((await file.path()) ?? ""))
+    chunks.push(chunk as Buffer);
+  const data = JSON.parse(Buffer.concat(chunks).toString());
+  expect(data.profile.email).toBe(user.email);
+  expect(data.entries[0].food).toBe("Toast");
+  await expect(page.getByText("Your file is downloading.")).toBeVisible();
+});

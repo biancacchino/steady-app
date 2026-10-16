@@ -10,8 +10,12 @@ How the pieces fit is in `design/steady-stack.html`.
 
 The journal (milestone 1): log what you ate and any symptoms, see one week at a time with plain observations, edit entries, flag the ones worth raising at an appointment, and delete with Undo.
 The appointment summary (milestone 2): pick a date range, read through the entries you flagged, leave any out, edit up to four questions, then export a PDF or copy the text. Export only works on a summary you marked reviewed.
+The Account page (milestone 4) saves a care team email or link for the "Message your care team" link, and downloads all your data as one JSON file (no password, sign-in details, or screening score).
 Account deletion: the Account page deletes the account, every entry, and every summary, after the password and the typed phrase "delete my account".
-The screener gate (milestone 3) comes next.
+The screener gate (milestone 3): a short set of questions (placeholder ones for now, labeled as such) comes before any diet content.
+Below the threshold, the diet plan opens with a 4 week end date and fixed reintroduction dates.
+At or above it, the plan stays hidden, a "who can help" page appears, and the questions cannot be answered again for 90 days.
+The server enforces this: `/api/diet` answers 403 without a current below-threshold screen.
 
 ## Run it locally
 
@@ -59,6 +63,7 @@ The first time, install the browsers with `npx playwright install`.
 
 | Command | What it does |
 |---|---|
+| `npm run check:bundle` | Fails if any diet content is in the built web app (run after `npm run build`) |
 | `npm run check:tone` | Fails on banned wording in user-facing text (PRD section 10) |
 | `npm run db:generate` | Writes a migration after a schema change in `packages/db/src/schema` |
 | `npm run db:studio` | Opens a browser view of the local database |
