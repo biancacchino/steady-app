@@ -113,7 +113,8 @@ for (const width of [320, 1280]) {
     const targets = page.locator(".sheet button, .sheet .incl, .sheet textarea, .site-head a");
     for (const target of await targets.all()) {
       const box = await target.boundingBox();
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+      // Rounded, because Firefox and 3x screens can report 44px as 43.99999.
+      expect(Math.round(box?.height ?? 0)).toBeGreaterThanOrEqual(44);
     }
   });
 }
