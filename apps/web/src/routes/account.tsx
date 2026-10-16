@@ -54,6 +54,8 @@ function Account() {
               <dd>{user.email}</dd>
             </dl>
           </section>
+          <CareTeam saved={user.careTeamLink ?? null} />
+          <YourData />
           <DeleteAccount
             onDeleted={() => {
               // An unsaved draft must not outlive the account on this device (decision 14).
@@ -64,6 +66,107 @@ function Account() {
         </main>
       )}
     </>
+  );
+}
+
+// The address or link behind "Message your care team" on the referral page (PRD 5.7). The server
+// turns an email address into a mailto link and accepts nothing but https links.
+function CareTeam({ saved }: { saved: string | null }) {
+  const [value, setValue] = useState(saved?.replace(/^mailto:/, "") ?? "");
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+    setPending(true);
+    const res = await fetch("/api/settings/care-team", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ link: value }),
+    }).catch(() => null);
+    setPending(false);
+    if (!res) return setError("Your care team contact was not saved. Check your connection.");
+    if (res.status === 400)
+      return setError("Enter an email address or a link that starts with https://.");
+    if (!res.ok) return setError("Your care team contact was not saved. Try again in a moment.");
+    const { link } = (await res.json()) as { link: string | null };
+    setValue(link?.replace(/^mailto:/, "") ?? "");
+    setMessage(link ? "Saved." : "Removed.");
+  }
+
+  return (
+    <section className="panel" aria-labelledby="care-title">
+      <h2 id="care-title">Your care team</h2>
+      <p>
+        Add an email address or a portal link. It is only used for the "Message your care team" link
+        on the page that lists people who can help. Steady never sends anything to it.
+      </p>
+      <Form className="form" onSubmit={onSubmit}>
+        <FormError message={error} />
+        <Field
+          label="Email address or link"
+          name="careTeam"
+          autoComplete="off"
+          hint="Leave it empty to remove it."
+          value={value}
+          onChange={(v) => {
+            setValue(v);
+            setMessage(null);
+          }}
+        />
+        <Button type="submit" className="btn btn-secondary" isDisabled={pending}>
+          {pending ? "Saving" : "Save"}
+        </Button>
+        <p role="status" className="small muted">
+          {message}
+        </p>
+      </Form>
+    </section>
+  );
+}
+
+// Everything Steady holds about the user, as one JSON file (PRD 7). Nothing is sent anywhere.
+function YourData() {
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function download() {
+    setPending(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/settings/export", { method: "POST" });
+      if (!res.ok) throw new Error();
+      const url = URL.createObjectURL(await res.blob());
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `steady-export-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage("Your file is downloading. Steady doesn't send it anywhere.");
+    } catch {
+      setMessage("Your data could not be downloaded. Try again.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <section className="panel" aria-labelledby="data-title">
+      <h2 id="data-title">Your data</h2>
+      <p>
+        Download your profile, journal entries, summaries, screening answers, diet plan, and
+        referral views as one file. It does not include your password or sign-in details.
+      </p>
+      <Button className="btn btn-secondary" isDisabled={pending} onPress={() => void download()}>
+        {pending ? "Preparing" : "Download my data"}
+      </Button>
+      <p role="status" className="small muted">
+        {message}
+      </p>
+    </section>
   );
 }
 

@@ -18,8 +18,8 @@ export const Route = createFileRoute("/referral")({
   component: ReferralPage,
 });
 
-// Only http(s) and mailto links are opened. The care-team link is saved by the user (milestone 4).
-const safeLink = (link: string | null) => (link && /^(https?:|mailto:)/i.test(link) ? link : null);
+// Only https and mailto links are opened. The user saves the care-team link on the Account page.
+const safeLink = (link: string | null) => (link && /^(https:|mailto:)/i.test(link) ? link : null);
 
 function ReferralPage() {
   const [data, setData] = useState<Referral | null>(null);
