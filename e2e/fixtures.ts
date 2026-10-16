@@ -72,6 +72,9 @@ export async function signUp(page: Page) {
   await page.getByLabel("Password").fill(user.password);
   await page.getByText("I am 18 or older").click();
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/journal$/);
+  // Sign-up hashes the password, commits three rows, and loads the journal. On a shared CI
+  // runner (two browsers, the server, and Postgres on one machine) that passed the default 5
+  // seconds about once in 200 sign-ups, though it never did locally in 600+ runs.
+  await expect(page).toHaveURL(/\/journal$/, { timeout: 15_000 });
   return user;
 }
