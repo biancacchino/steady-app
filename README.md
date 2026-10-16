@@ -10,6 +10,7 @@ How the pieces fit is in `design/steady-stack.html`.
 
 The journal (milestone 1): log what you ate and any symptoms, see one week at a time with plain observations, edit entries, flag the ones worth raising at an appointment, and delete with Undo.
 The appointment summary (milestone 2): pick a date range, read through the entries you flagged, leave any out, edit up to four questions, then export a PDF or copy the text. Export only works on a summary you marked reviewed.
+Account deletion: the Account page deletes the account, every entry, and every summary, after the password and the typed phrase "delete my account".
 The screener gate (milestone 3) comes next.
 
 ## Run it locally

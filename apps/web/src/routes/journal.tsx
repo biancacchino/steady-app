@@ -429,6 +429,9 @@ function SiteHead() {
           <Link to="/summary" className="btn btn-secondary btn-sm">
             Appointment summary
           </Link>
+          <Link to="/account" className="btn btn-secondary btn-sm">
+            Account
+          </Link>
           <Button className="btn btn-secondary btn-sm" onPress={() => void signOut()}>
             Sign out
           </Button>

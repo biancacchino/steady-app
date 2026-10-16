@@ -356,7 +356,10 @@ Each milestone ends with its acceptance criteria passing in CI.
 | 1 | Journal | Entry create, edit, delete, week view, New entry card, flagging, weekly observations |
 | 2 | Summary | Date range, three sections, include and exclude, question templates, review snapshot, PDF, clipboard |
 | 3 | Screener gate | Instrument as data, placeholder instrument, flow, server gate, 90-day expiry, referral flow, placeholder diet plan |
-| 4 | Account and polish | Export JSON, full deletion, settings (care team link), accessibility pass, tone review of every string |
+| 4 | Account and polish | Export JSON, settings (care team link), accessibility pass, tone review of every string |
+
+Full deletion moved ahead of milestone 2 so a hosted "Try it out" never leaves a visitor's data stuck on the server (2026-10-15, `tasks/account-deletion.md`).
+Deletion asks for the password and the typed phrase "delete my account".
 
 The gate (milestone 3) is built before any diet content exists, so diet content is never reachable ungated, even during development.
 

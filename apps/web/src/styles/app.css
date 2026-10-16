@@ -82,6 +82,27 @@ a {
   gap: 12px;
 }
 
+/* Account page */
+.details {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 24px;
+}
+.details dt {
+  color: var(--muted);
+}
+.details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* Buttons: 44px tall targets */
 .btn {
   font: 500 15px / 1 var(--sans);
@@ -571,7 +592,8 @@ button.wd {
   gap: 12px;
   padding: 20px 24px 12px;
 }
-.dlg-head h2 {
+.dlg-head h2,
+.account h2 {
   font: 400 26px / 1.1 var(--display);
   letter-spacing: -0.02em;
 }
