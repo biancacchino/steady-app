@@ -15,8 +15,8 @@ function AboutHealthcare() {
         <h1 id="hero-title">The healthcare side of Steady</h1>
         <div className="lede">
           <p>
-            My sister, Beatrice Javier, RN, brought the research and the product idea behind Steady.
-            She's writing this page herself, so it's short for now.
+            Beatrice Javier, RN, brought the research and the product idea behind Steady. She's
+            writing this page herself, so it's short for now.
           </p>
           <p>Until it's ready, the home page lists the sources each design choice comes from.</p>
         </div>

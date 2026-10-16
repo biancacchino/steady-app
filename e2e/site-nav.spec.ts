@@ -114,11 +114,11 @@ test("the about pages link each author's profiles", async ({ page, ip: _ }) => {
 
   await page.goto("/about/software");
   const software = page.getByRole("main");
-  await expect(software.getByRole("link", { name: "My LinkedIn" })).toHaveAttribute(
+  await expect(software.getByRole("link", { name: "Bianca on LinkedIn" })).toHaveAttribute(
     "href",
     "https://www.linkedin.com/in/javierbianca/",
   );
-  await expect(software.getByRole("link", { name: "My GitHub" })).toHaveAttribute(
+  await expect(software.getByRole("link", { name: "Bianca on GitHub" })).toHaveAttribute(
     "href",
     "https://github.com/biancacchino",
   );

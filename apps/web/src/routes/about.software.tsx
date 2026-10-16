@@ -15,9 +15,9 @@ function AboutSoftware() {
         <h1 id="hero-title">How Steady is built</h1>
         <div className="lede">
           <p>
-            I'm Bianca Javier, a third-year computer science student. I built Steady end to end: the
-            database, the server, the web app, the tests, and the deploy. My sister Beatrice, a
-            registered nurse, brought the research and the product idea.
+            Bianca Javier, a third-year computer science student, built Steady end to end: the
+            database, the server, the web app, the tests, and the deploy. Her sister, Beatrice
+            Javier, a registered nurse, brought the research and the product idea.
           </p>
           <p>
             It's a health app, so most of the work went into what it refuses to do: load anything
@@ -29,10 +29,10 @@ function AboutSoftware() {
             Read the code on GitHub
           </a>
           <a href="https://www.linkedin.com/in/javierbianca/" className="btn btn-secondary">
-            My LinkedIn
+            Bianca on LinkedIn
           </a>
           <a href="https://github.com/biancacchino" className="btn btn-secondary">
-            My GitHub
+            Bianca on GitHub
           </a>
         </div>
       </section>
@@ -102,7 +102,7 @@ function AboutSoftware() {
 
       <section className="land-sec" aria-labelledby="decisions-title">
         <div className="sec-head">
-          <h2 id="decisions-title">Decisions I'd defend</h2>
+          <h2 id="decisions-title">Why it's built this way</h2>
           <p className="muted">Each one is backed by a test or a server check.</p>
         </div>
         <div className="items">
