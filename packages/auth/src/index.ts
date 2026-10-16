@@ -1,11 +1,18 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { db } from "@steady/db";
 import * as schema from "@steady/db/schema/auth";
 import { env } from "@steady/env/server";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 
 const MAX_NAME_LENGTH = 100;
+
+// Hashing first gives both sides the same length, so the comparison takes the same time whatever
+// was typed and leaks nothing about the code.
+const digest = (text: string) => createHash("sha256").update(text).digest();
+const isInviteCode = (code: unknown) =>
+  typeof code === "string" && timingSafeEqual(digest(code), digest(env.INVITE_CODE));
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
@@ -19,6 +26,18 @@ export const auth = betterAuth({
       ageConfirmedAt: { type: "date", required: true, input: true },
       careTeamLink: { type: "string", required: false, input: false },
     },
+  },
+  // Sign-up is invite only (tasks/deploy.md). This runs before Better-Auth looks up the email, so
+  // without the code nobody can learn whether an email already has an account.
+  // ponytail: one shared code; single-use codes in the database if it leaks or many people use it.
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/sign-up/email" && !isInviteCode(ctx.body?.inviteCode)) {
+        throw new APIError("FORBIDDEN", {
+          message: "That invite code doesn't work. Check it and try again.",
+        });
+      }
+    }),
   },
   databaseHooks: {
     user: {

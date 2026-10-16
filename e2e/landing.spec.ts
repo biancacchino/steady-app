@@ -48,13 +48,13 @@ test("the sample entry uses the journal's labeled rows and is not interactive", 
   await expect(sample.getByRole("link")).toHaveCount(0);
 });
 
-test("signed out, Try it out goes to sign-up", async ({ page, ip: _ }) => {
+test("signed out, Join the waitlist opens an email to a real address", async ({ page, ip: _ }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Open your journal" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/sign-in");
-  await page.getByRole("link", { name: "Try it out" }).click();
-  await expect(page).toHaveURL(/\/sign-up$/);
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  const href = await page.getByRole("link", { name: "Join the waitlist" }).getAttribute("href");
+  const email = "steadyappjournal@gmail.com";
+  expect(href).toBe(`mailto:${email}?subject=Steady%20waitlist`);
 });
 
 test("signed in, the landing page offers Open your journal instead", async ({
@@ -70,7 +70,7 @@ test("signed in, the landing page offers Open your journal instead", async ({
 
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole("link", { name: "Try it out" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Join the waitlist" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Sign in" })).toHaveCount(0);
   await page.getByRole("link", { name: "Open your journal" }).click();
   await expect(page).toHaveURL(/\/journal$/);
@@ -88,7 +88,7 @@ for (const width of [320, 390, 1280]) {
     );
     expect(overflow).toBe(0);
 
-    for (const name of ["Try it out", "Sign in"]) {
+    for (const name of ["Join the waitlist", "Sign in"]) {
       const box = await page.getByRole("link", { name }).boundingBox();
       expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
     }

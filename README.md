@@ -17,7 +17,7 @@ You need Node 24 and a Docker engine (OrbStack or Docker Desktop).
 
 ```sh
 npm install
-cp apps/server/.env.example apps/server/.env   # then set BETTER_AUTH_SECRET: openssl rand -base64 32
+cp apps/server/.env.example apps/server/.env   # then set BETTER_AUTH_SECRET (openssl rand -base64 32) and INVITE_CODE (openssl rand -hex 16)
 npm run db:start                               # Postgres 18 in Docker, on port 5432
 npm run db:migrate                             # apply migrations
 npm run db:seed                                # create the demo account
@@ -26,6 +26,7 @@ npm run dev                                    # web on http://localhost:5173, A
 
 Open http://localhost:5173 for the landing page, then choose Sign in and use the demo account: `user@example.com` / `Password123!`.
 The landing page at `/` is open to everyone; its text lives in `apps/web/src/routes/index.tsx`.
+Sign-up is invite only: a new account needs the `INVITE_CODE` from `apps/server/.env`.
 The seed script only runs against a database on this machine, so this account never reaches a real deployment.
 In development, Vite forwards `/api` to the Hono server, so the browser only ever talks to one origin.
 

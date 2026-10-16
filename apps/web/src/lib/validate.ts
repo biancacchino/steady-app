@@ -14,12 +14,14 @@ export function checkSignIn(v: { email: string; password: string }): Errors {
 }
 
 export function checkSignUp(v: {
+  inviteCode: string;
   name: string;
   email: string;
   password: string;
   adult: boolean;
 }): Errors {
   const e: Errors = {};
+  if (!v.inviteCode.trim()) e.inviteCode = "Enter your invite code.";
   if (!v.name.trim()) e.name = "Enter your name.";
   else if (v.name.trim().length > 100) e.name = "Use a name up to 100 characters.";
   Object.assign(e, checkSignIn(v));

@@ -11,9 +11,9 @@ Health data raises the bar: anything touching screening, export, sharing, or thi
 
 ## Repo map
 
-- `apps/web` - React + TanStack Router app. Routes in `src/routes`, React Aria components in `src/components`, tokens in `src/styles/tokens.css`. `src/routes/index.tsx` is the landing page at `/` for everyone (styles in `src/styles/landing.css`); signed-in visitors get "Open your journal" instead of "Try it out" and "Sign in".
+- `apps/web` - React + TanStack Router app. Routes in `src/routes`, React Aria components in `src/components`, tokens in `src/styles/tokens.css`. `src/routes/index.tsx` is the landing page at `/` for everyone (styles in `src/styles/landing.css`); signed-out visitors get "Join the waitlist" (an email link) and "Sign in"; signed-in visitors get "Open your journal".
 - `apps/server` - Hono server. `src/app.ts` holds middleware, security headers, the error handler, and routes; `src/entries.ts` is the journal entries API; `src/index.ts` starts it. In production it also serves `apps/web/dist`.
-- `packages/auth` - Better-Auth config (18+ confirmation, rate limit).
+- `packages/auth` - Better-Auth config (invite-only sign-up via `INVITE_CODE`, 18+ confirmation, rate limit).
 - `packages/db` - Drizzle schema in `src/schema`, migrations in `src/migrations`, Postgres in `docker-compose.yml`.
 - `packages/env` - Validated server environment variables.
 - `scripts` - `check-tone.mjs`, with tests in `checks.test.mjs`. Third-party loads are caught by `e2e/fixtures.ts`.

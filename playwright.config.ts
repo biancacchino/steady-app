@@ -4,6 +4,8 @@ import { defineConfig, devices } from "@playwright/test";
 // with the real security headers. Port 3100 keeps it apart from `npm run dev`; E2E_PORT lets a
 // second worktree run its tests at the same time.
 const PORT = Number(process.env.E2E_PORT ?? 3100);
+// The invite code the test server accepts. Test workers inherit it, so fixtures.ts can read it.
+process.env.INVITE_CODE ??= "e2e-invite-code-for-tests";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -41,6 +43,7 @@ export default defineConfig({
       NODE_ENV: "production",
       PORT: String(PORT),
       BETTER_AUTH_URL: `http://localhost:${PORT}`,
+      INVITE_CODE: process.env.INVITE_CODE,
     },
   },
 });

@@ -3,6 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { getSession } from "@/lib/auth-client";
 
 // The landing page is for everyone. Only the hero actions depend on the session.
+// Sign-up is invite only, so visitors without a code ask by email. Nothing is stored in Steady.
+const WAITLIST_EMAIL = "steadyappjournal@gmail.com";
+
 export const Route = createFileRoute("/")({
   loader: async () => ({ signedIn: Boolean(await getSession()) }),
   component: Landing,
@@ -38,9 +41,12 @@ function Landing() {
               </Link>
             ) : (
               <>
-                <Link to="/sign-up" className="btn btn-primary">
-                  Try it out
-                </Link>
+                <a
+                  href={`mailto:${WAITLIST_EMAIL}?subject=Steady%20waitlist`}
+                  className="btn btn-primary"
+                >
+                  Join the waitlist
+                </a>
                 <Link to="/sign-in" className="btn btn-secondary">
                   Sign in
                 </Link>

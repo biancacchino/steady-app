@@ -39,12 +39,16 @@ export const test = base.extend<{ ip: string }>({
 
 export { expect };
 
+/** Set in playwright.config.ts and passed to the test server. */
+export const INVITE_CODE = process.env.INVITE_CODE ?? "";
+
 export function newUser() {
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   return {
     name: "Test Person",
     email: `test-${id}@example.com`,
     password: "correct horse battery",
+    inviteCode: INVITE_CODE,
   };
 }
 
@@ -54,6 +58,7 @@ export const weekUrl = (week: string) => `/journal?week=${week}`;
 export async function signUp(page: Page) {
   const user = newUser();
   await page.goto("/sign-up");
+  await page.getByLabel("Invite code").fill(user.inviteCode);
   await page.getByLabel("Your name").fill(user.name);
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
