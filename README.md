@@ -1,21 +1,94 @@
 # Steady
 
-A food and symptom journal for people with IBS, with an eating-disorder risk screen before any diet guidance, and a short summary to bring to appointments.
+[![CI](https://github.com/biancacchino/steady-app/actions/workflows/ci.yml/badge.svg)](https://github.com/biancacchino/steady-app/actions/workflows/ci.yml)
 
-What it must do is in `docs/prd.md`.
-How it should look is in `docs/design-brief.md`.
-How the pieces fit is in `design/steady-stack.html`.
+A food and symptom journal for people with IBS.
+It checks for eating-disorder risk before showing any diet guidance, and it turns your journal into a short summary to bring to appointments.
 
-## What works today
+## Why it exists
 
-The journal (milestone 1): log what you ate and any symptoms, see one week at a time with plain observations, edit entries, flag the ones worth raising at an appointment, and delete with Undo.
-The appointment summary (milestone 2): pick a date range, read through the entries you flagged, leave any out, edit up to four questions, then export a PDF or copy the text. Export only works on a summary you marked reviewed.
-The Account page (milestone 4) saves a care team email or link for the "Message your care team" link, and downloads all your data as one JSON file (no password, sign-in details, or screening score).
-Account deletion: the Account page deletes the account, every entry, and every summary, after the password and the typed phrase "delete my account".
-The screener gate (milestone 3): a short set of questions (placeholder ones for now, labeled as such) comes before any diet content.
-Below the threshold, the diet plan opens with a 4 week end date and fixed reintroduction dates.
-At or above it, the plan stays hidden, a "who can help" page appears, and the questions cannot be answered again for 90 days.
-The server enforces this: `/api/diet` answers 403 without a current below-threshold screen.
+Elimination diets like low-FODMAP ask people to cut foods and track their bodies closely.
+Those habits overlap with disordered eating, and clinical guidance says to screen for that risk first.
+Appointments are also short, usually 10 to 15 minutes, which isn't enough to explain weeks of changing symptoms.
+
+Steady handles both: a screener before any diet content, a journal that doesn't judge, and a summary you review before anyone else sees it.
+The full requirements are in [`docs/prd.md`](docs/prd.md).
+
+## What it does
+
+- **Journal.** Log what you ate and any symptoms, one week at a time, with plain observations like "3 of 7 logged days mentioned bloating."
+  Edit, delete with Undo, and flag entries worth raising at an appointment.
+- **Appointment summary.** Pick a date range, go through your flagged entries, leave any out, and edit up to four questions.
+  Export a PDF or copy the text, but only after you mark the summary reviewed.
+- **Screener gate.** A short set of questions comes before any diet plan.
+  The questions are placeholders for now and are labeled that way.
+  Below the threshold, the plan opens with a 4-week end date and fixed reintroduction dates.
+  At or above it, the plan stays hidden, a "who can help" page appears, and the screener locks for 90 days.
+- **Account.** Save a care team email or link, download all your data as one JSON file, or delete the account and everything in it.
+  The export leaves out your password, sign-in details, and screening score.
+  Deleting needs your password and the typed phrase "delete my account".
+
+Sign-up is invite only and requires confirming you are 18 or older.
+
+## How it fits together
+
+The browser only ever talks to one origin.
+In development, Vite forwards `/api` to the Hono server; in production, the Hono server serves the built app itself.
+
+```mermaid
+flowchart LR
+  browser["Browser<br/>React + TanStack Router"]
+  subgraph server["Hono server (one origin)"]
+    auth["Better-Auth<br/>session on every route"]
+    gates["Gates<br/>diet screen, summary review"]
+    orm["Drizzle ORM"]
+  end
+  db[("Postgres 18")]
+  browser -- "JSON + session cookie" --> auth --> gates --> orm --> db
+```
+
+The rules that matter live on the server, not in React, because anyone can call the API directly.
+`/api/diet` answers 403 unless the user has a current screen below the threshold, and export refuses a summary that isn't marked reviewed.
+
+```mermaid
+flowchart TD
+  open["User opens the diet plan"] --> current{"Current screen<br/>on file?"}
+  current -- "no" --> screener["Answer the screener"] --> score{"Below the<br/>threshold?"}
+  current -- "yes" --> score
+  score -- "yes" --> plan["Diet plan<br/>4 weeks, set reintroduction dates"]
+  score -- "no" --> help["Who can help page<br/>screener locked for 90 days"]
+```
+
+The diet text never reaches the browser bundle.
+`npm run check:bundle` fails the build if it does.
+
+More detail, including the data model by milestone, is in [`design/steady-stack.html`](design/steady-stack.html).
+The visual rules are in [`docs/design-brief.md`](docs/design-brief.md).
+
+## Stack
+
+| Part | Tools |
+|---|---|
+| Web | React 19, TanStack Router, React Aria Components, plain CSS with design tokens |
+| Server | Node 24, Hono, Better-Auth, pdfkit for the summary PDF |
+| Data | Postgres 18, Drizzle ORM with committed migrations |
+| Tooling | npm workspaces, Turborepo, Biome, Vitest, Playwright |
+
+There are no analytics and nothing loads from another origin.
+The Content Security Policy allows no inline scripts or styles, and fonts are self-hosted.
+
+## Repository layout
+
+| Path | What's there |
+|---|---|
+| `apps/web` | The React app. Routes in `src/routes`, components in `src/components`, tokens in `src/styles/tokens.css` |
+| `apps/server` | The Hono API, security headers, the summary PDF, and the screener rules |
+| `packages/auth` | Better-Auth config: invite codes, 18+ confirmation, rate limits, account deletion |
+| `packages/db` | Drizzle schema, migrations, and the local Postgres `docker-compose.yml` |
+| `packages/env` | Validated server environment variables |
+| `e2e` | Playwright tests |
+| `scripts` | The tone check and the bundle check |
+| `docs`, `design` | Requirements, design brief, and reference pages |
 
 ## Run it locally
 
@@ -30,24 +103,11 @@ npm run db:seed                                # create the demo account
 npm run dev                                    # web on http://localhost:5173, API on :3000
 ```
 
-Open http://localhost:5173 for the landing page, then choose Sign in and use the demo account: `user@example.com` / `Password123!`.
-The landing page at `/` is open to everyone; its text lives in `apps/web/src/routes/index.tsx`.
-Every page shares one header and footer (`apps/web/src/components/site-header.tsx` and `site-footer.tsx`), with "How it's made" linking the healthcare and software pages.
-Sign-up is invite only: a new account needs the `INVITE_CODE` from `apps/server/.env`.
-The seed script only runs against a database on this machine, so this account never reaches a real deployment.
-In development, Vite forwards `/api` to the Hono server, so the browser only ever talks to one origin.
+Open http://localhost:5173, choose Sign in, and use the demo account: `user@example.com` / `Password123!`.
+The seed script only runs against a database on this machine, so the demo account never reaches a real deployment.
+To create a new account, you need the `INVITE_CODE` from `apps/server/.env`.
 
-## Deploy
-
-Steady runs on Render's free web service with Postgres 18 on Neon's free plan (`tasks/deploy.md`).
-`render.yaml` is the Blueprint: it builds with `npm ci --include=dev && npm run build`, runs migrations, then starts the server, which serves the API and the built app from one origin.
-
-1. Create a Neon project on Postgres 18 and copy its connection string (it ends in `?sslmode=require`).
-2. In Render, choose New, then Blueprint, pick this repository, and use the same region as Neon.
-3. Set `DATABASE_URL`, `INVITE_CODE` (`openssl rand -hex 16`), and `BETTER_AUTH_URL` (the `https://...onrender.com` address) in the dashboard. Render generates `BETTER_AUTH_SECRET`.
-4. Never use Render's free Postgres: it is deleted 44 days after it is created.
-
-The free web service sleeps after 15 minutes without visitors, so the first visit after that takes about a minute.
+To reset the local database: `docker compose -f packages/db/docker-compose.yml down -v`, then `npm run db:start`, `npm run db:migrate`, and `npm run db:seed`.
 
 ## Checks
 
@@ -55,12 +115,13 @@ The free web service sleeps after 15 minutes without visitors, so the first visi
 npm run ci
 ```
 
-This runs everything CI runs, in order: format, lint, type check, tone check, unit tests, production build, dependency audit, and the Playwright tests in Chrome, Firefox, Safari, and iPhone Safari.
-Every Playwright test also fails if the page requests anything from another website or breaks the Content Security Policy.
-The Playwright tests build and start the production server on port 3100 and need Postgres running.
-They never reuse a server already on that port, which may be another worktree's build; set `E2E_PORT` to run them in a second worktree at the same time.
-The unit tests need it too, with migrations applied: some check the database's rules and the entries API against the real tables.
+This runs everything CI runs, in order: format, lint, type check, tone check, unit tests, production build, bundle check, dependency audit, and the Playwright tests in Chrome, Firefox, Safari, and iPhone Safari.
+Every Playwright test also fails if the page loads anything from another website or breaks the Content Security Policy.
+
+Postgres has to be running with migrations applied, since some unit tests check the real tables.
 The first time, install the browsers with `npx playwright install`.
+The Playwright tests build and start their own server on port 3100 and never reuse one already there.
+Set `E2E_PORT` to run them in a second worktree at the same time.
 
 | Command | What it does |
 |---|---|
@@ -70,7 +131,19 @@ The first time, install the browsers with `npx playwright install`.
 | `npm run db:studio` | Opens a browser view of the local database |
 | `npm run db:seed` | Creates the demo account; safe to run again |
 
-To reset the local database: `docker compose -f packages/db/docker-compose.yml down -v`, then `npm run db:start`, `npm run db:migrate`, and `npm run db:seed`.
+## Deploy
+
+Steady runs on Render's free web service with Postgres 18 on Neon's free plan.
+`render.yaml` is the Blueprint: it builds with `npm ci --include=dev && npm run build`, runs migrations, then starts the server.
+
+1. Create a Neon project on Postgres 18 and copy its connection string (it ends in `?sslmode=require`).
+2. In Render, choose New, then Blueprint, pick this repository, and use the same region as Neon.
+3. Set `DATABASE_URL`, `INVITE_CODE` (`openssl rand -hex 16`), and `BETTER_AUTH_URL` (the `https://...onrender.com` address) in the dashboard.
+   Render generates `BETTER_AUTH_SECRET`.
+
+Don't use Render's free Postgres: it's deleted 44 days after it's created.
+The free web service sleeps after 15 minutes without visitors, so the first visit after that takes about a minute.
+More notes are in [`tasks/deploy.md`](tasks/deploy.md).
 
 ## How it was scaffolded
 
