@@ -15,11 +15,12 @@ Health data raises the bar: anything touching screening, export, sharing, or thi
 - `apps/server` - Hono server. `src/app.ts` holds middleware, security headers, the error handler, and routes; `src/entries.ts` is the journal entries API; `src/summaries.ts` is the appointment summary API, with its content in `src/summary-content.ts` and its PDF in `src/summary-pdf.ts` (pdfkit); `src/index.ts` starts it. In production it also serves `apps/web/dist`.
 - `packages/auth` - Better-Auth config (invite-only sign-up via `INVITE_CODE`, 18+ confirmation, rate limit, account deletion with password and typed phrase).
 - `packages/db` - Drizzle schema in `src/schema`, migrations in `src/migrations`, Postgres in `docker-compose.yml`.
-- `packages/env` - Validated server environment variables.
+- `packages/env` - Validated server environment variables. `CLIENT_IP_HEADER` names the one header rate limiting reads (`cf-connecting-ip` on Render).
 - `scripts` - `check-tone.mjs`, with tests in `checks.test.mjs`. Third-party loads are caught by `e2e/fixtures.ts`.
 - `e2e` - Playwright tests, type-checked by `tsc -p e2e` in `npm run check-types`. `fixtures.ts` gives each test its own IP and fails any test that loads another origin or hits a CSP violation.
 - `docs` - `prd.md` (requirements), `design-brief.md` (visual rules).
 - `design` - Reference pages: `steady-design.html` (the source for tokens), `steady-stack.html` (stack and data diagrams).
+- `render.yaml` - Render Blueprint for the hosted MVP (free web service; Postgres is on Neon). See the README's Deploy section.
 - `tasks` - `todo.md` (current milestone), `lessons.md` (corrections to remember).
 
 ## Run locally
