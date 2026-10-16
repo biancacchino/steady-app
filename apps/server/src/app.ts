@@ -7,6 +7,7 @@ import { bodyLimit } from "hono/body-limit";
 import { secureHeaders } from "hono/secure-headers";
 
 import { entries } from "./entries";
+import { summaries } from "./summaries";
 
 export type Variables = { user: typeof auth.$Infer.Session.user };
 
@@ -63,6 +64,7 @@ app.onError((err, c) => {
 });
 
 app.route("/api/entries", entries);
+app.route("/api/summaries", summaries);
 
 app.get("/api/me", (c) => {
   const { id, email, name } = c.get("user");

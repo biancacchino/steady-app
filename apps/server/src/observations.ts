@@ -30,7 +30,7 @@ const PHRASES: [RegExp, string][] = [
 // parser is the upgrade if these sentences ever need to be exact.
 const NEGATIONS = new Set(["no", "not", "without", "didn't"]);
 
-type Entry = { occurredAt: Date; timeZone: string; symptom: string | null };
+export type Entry = { occurredAt: Date; timeZone: string; symptom: string | null };
 
 /** The symptoms a note mentions, skipping negated ones. */
 export function symptomsIn(note: string): Set<string> {
@@ -50,7 +50,7 @@ export function symptomsIn(note: string): Set<string> {
 }
 
 /** The entry's calendar day in its own zone (decision 4), as YYYY-MM-DD. */
-function localDay({ occurredAt, timeZone }: Entry): string {
+export function localDay({ occurredAt, timeZone }: Entry): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone }).format(occurredAt);
 }
 
