@@ -120,6 +120,7 @@ describe("the diet gate", () => {
     await storeResult(maya.id, "below", 1);
     const start = await call(maya.cookie, "POST", "/api/diet/start");
     expect(start.status).toBe(201);
+    expect(await start.json()).toMatchObject({ status: "active" });
     const [plan] = await db.select().from(dietPlan).where(eq(dietPlan.userId, maya.id));
     expect(plan?.status).toBe("active");
     const days =

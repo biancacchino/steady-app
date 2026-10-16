@@ -182,9 +182,13 @@ export const dietApi = new Hono<Env>()
         ),
       })
       .onConflictDoNothing()
-      .returning({ id: dietPlan.id });
+      .returning({
+        startedAt: dietPlan.startedAt,
+        eliminationEndsAt: dietPlan.eliminationEndsAt,
+        status: dietPlan.status,
+      });
     if (!created) return c.json({ error: "You already have a plan." }, 409);
-    return c.json({ id: created.id }, 201);
+    return c.json(created, 201);
   });
 
 export const referralApi = new Hono<Env>().post("/", async (c) => {

@@ -79,15 +79,20 @@ function Plan({ diet }: { diet: Diet }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const { plan, content } = diet;
+  const { content } = diet;
+  // Set from the start request's own answer. Re-reading the page's data after the start raced with a
+  // load already in flight, and about 1 run in 4 under load still showed "Start the plan".
+  const [started, setStarted] = useState<NonNullable<Diet["plan"]> | null>(null);
+  const plan = started ?? diet.plan;
 
   async function start() {
     setPending(true);
     setError(null);
     try {
       const res = await fetch("/api/diet/start", { method: "POST" });
-      if (!res.ok && res.status !== 409) throw new Error("start failed");
-      await router.invalidate();
+      if (res.status === 409) await router.invalidate();
+      else if (res.ok) setStarted((await res.json()) as NonNullable<Diet["plan"]>);
+      else throw new Error("start failed");
     } catch {
       setError("The plan could not be started. Try again.");
     } finally {
