@@ -99,6 +99,9 @@ export const auth = betterAuth({
   // Sign-in, sign-up, and delete-user allow 3 attempts per 10 seconds per IP.
   // ponytail: in-memory store, resets on restart and is per server process; move to the
   // database store if Steady ever runs more than one server.
-  // Deploy blocker: set advanced.ipAddress.trustedProxies to the host's proxy range (tasks/todo.md).
   rateLimit: { enabled: true, customRules: { "/delete-user": { window: 10, max: 3 } } },
+  // The visitor's address comes from one header only (packages/env, CLIENT_IP_HEADER), so a
+  // header the visitor can fake is never read. If the header is missing, Better-Auth logs a
+  // warning and falls back to one shared bucket, which shows up in the logs instead of hiding.
+  advanced: { ipAddress: { ipAddressHeaders: [env.CLIENT_IP_HEADER] } },
 });
