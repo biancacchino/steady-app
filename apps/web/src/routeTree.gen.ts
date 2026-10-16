@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as DietRouteImport } from './routes/diet'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as ReferralRouteImport } from './routes/referral'
+import { Route as ScreeningRouteImport } from './routes/screening'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SummaryRouteImport } from './routes/summary'
@@ -26,9 +29,24 @@ const AccountRoute = AccountRouteImport.update({
   path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DietRoute = DietRouteImport.update({
+  id: '/diet',
+  path: '/diet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JournalRoute = JournalRouteImport.update({
   id: '/journal',
   path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralRoute = ReferralRouteImport.update({
+  id: '/referral',
+  path: '/referral',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScreeningRoute = ScreeningRouteImport.update({
+  id: '/screening',
+  path: '/screening',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignInRoute = SignInRouteImport.update({
@@ -50,7 +68,10 @@ const SummaryRoute = SummaryRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/diet': typeof DietRoute
   '/journal': typeof JournalRoute
+  '/referral': typeof ReferralRoute
+  '/screening': typeof ScreeningRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
@@ -58,7 +79,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/diet': typeof DietRoute
   '/journal': typeof JournalRoute
+  '/referral': typeof ReferralRoute
+  '/screening': typeof ScreeningRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
@@ -67,7 +91,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/diet': typeof DietRoute
   '/journal': typeof JournalRoute
+  '/referral': typeof ReferralRoute
+  '/screening': typeof ScreeningRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
@@ -75,14 +102,34 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/account' | '/journal' | '/sign-in' | '/sign-up' | '/summary'
+    | '/'
+    | '/account'
+    | '/diet'
+    | '/journal'
+    | '/referral'
+    | '/screening'
+    | '/sign-in'
+    | '/sign-up'
+    | '/summary'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/journal' | '/sign-in' | '/sign-up' | '/summary'
+  to:
+    | '/'
+    | '/account'
+    | '/diet'
+    | '/journal'
+    | '/referral'
+    | '/screening'
+    | '/sign-in'
+    | '/sign-up'
+    | '/summary'
   id:
     | '__root__'
     | '/'
     | '/account'
+    | '/diet'
     | '/journal'
+    | '/referral'
+    | '/screening'
     | '/sign-in'
     | '/sign-up'
     | '/summary'
@@ -91,7 +138,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  DietRoute: typeof DietRoute
   JournalRoute: typeof JournalRoute
+  ReferralRoute: typeof ReferralRoute
+  ScreeningRoute: typeof ScreeningRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SummaryRoute: typeof SummaryRoute
@@ -113,11 +163,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/diet': {
+      id: '/diet'
+      path: '/diet'
+      fullPath: '/diet'
+      preLoaderRoute: typeof DietRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/journal': {
       id: '/journal'
       path: '/journal'
       fullPath: '/journal'
       preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referral': {
+      id: '/referral'
+      path: '/referral'
+      fullPath: '/referral'
+      preLoaderRoute: typeof ReferralRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/screening': {
+      id: '/screening'
+      path: '/screening'
+      fullPath: '/screening'
+      preLoaderRoute: typeof ScreeningRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sign-in': {
@@ -147,7 +218,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  DietRoute: DietRoute,
   JournalRoute: JournalRoute,
+  ReferralRoute: ReferralRoute,
+  ScreeningRoute: ScreeningRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SummaryRoute: SummaryRoute,

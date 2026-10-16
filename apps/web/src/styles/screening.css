@@ -1,0 +1,95 @@
+/* Screener, diet plan, and referral pages */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.notice {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface-warm);
+  font-size: 14px;
+}
+.screen h1:focus,
+.panel h1:focus {
+  outline: none;
+}
+.choices {
+  display: grid;
+  gap: 8px;
+}
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  cursor: pointer;
+}
+.choice::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--muted);
+  border-radius: 50%;
+}
+.choice[data-selected] {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.choice[data-selected]::before {
+  border-color: var(--primary);
+  background: var(--primary);
+  box-shadow: inset 0 0 0 3px var(--surface);
+}
+.choice[data-focus-visible] {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.screen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.review {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 16px;
+}
+.review li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  align-items: center;
+}
+.review li span:first-child {
+  grid-column: 1 / -1;
+}
+.steps,
+.resources {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 16px;
+}
+.steps li,
+.resources li {
+  display: grid;
+  gap: 2px;
+}
+.panel > .btn {
+  justify-self: start;
+}
