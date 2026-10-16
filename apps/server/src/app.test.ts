@@ -28,6 +28,11 @@ describe("server", () => {
     expect(csp).not.toMatch(/https?:\/\//);
   });
 
+  it("tells browsers not to store API answers, which can hold journal text", async () => {
+    const res = await app.request("/api/me");
+    expect(res.headers.get("cache-control")).toBe("no-store");
+  });
+
   it("logs a server error without its message, which can hold journal text", async () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const res = await app.request("/test-error");
