@@ -16,7 +16,12 @@ const isInviteCode = (code: unknown) =>
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
-  database: drizzleAdapter(db, { provider: "pg", schema }),
+  // transaction: Better-Auth's sign-up writes the user, the password account, and the session.
+  // The adapter's default runs them as three separate commits, so a failure part way left a user
+  // who could not sign in, and each commit waited on its own disk flush, which under load kept
+  // sign-up pending past 5 seconds. One transaction makes it all-or-nothing with one flush.
+  // Trade-off: the transaction holds a pool connection while the password hashes (about 80ms).
+  database: drizzleAdapter(db, { provider: "pg", schema, transaction: true }),
   // Must match apps/web/src/lib/validate.ts. e2e/auth.spec.ts fails if the server side drifts.
   emailAndPassword: { enabled: true, minPasswordLength: 8 },
   user: {
