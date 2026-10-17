@@ -68,7 +68,11 @@ test("signed in, the landing page offers Open your journal instead", async ({
   baseURL,
 }) => {
   const created = await page.request.post("/api/auth/sign-up/email", {
-    data: { ...newUser(), ageConfirmedAt: new Date().toISOString() },
+    data: {
+      ...newUser(),
+      ageConfirmedAt: new Date().toISOString(),
+      privacyConsentAt: new Date().toISOString(),
+    },
     headers: { "x-forwarded-for": ip, origin: baseURL ?? "" },
   });
   expect(created.ok()).toBe(true);

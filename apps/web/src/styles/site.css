@@ -199,7 +199,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   gap: 32px;
-  max-width: 44rem;
+  max-width: 46rem; /* three 14rem columns and their gaps */
 }
 .foot-cols nav {
   display: grid;
@@ -209,8 +209,10 @@
 .foot-title {
   font: 500 16px / 1.4 var(--sans);
 }
+/* min-width: without side padding, a short word like "Terms" is narrower than 44px. */
 .foot-links .nav-link {
   padding-inline: 0;
+  min-width: 44px;
   color: var(--muted);
   font-weight: 400;
 }

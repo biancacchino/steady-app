@@ -9,7 +9,7 @@ import {
 } from "@/components/site-header";
 import { authClient } from "@/lib/auth-client";
 
-/** The footer on every page: the header's links again, the credits, and the prototype note. */
+/** The footer on every page: the header's links again, the privacy and terms pages, the credits, and the prototype note. */
 export function SiteFooter() {
   const { data, isPending } = authClient.useSession();
 
@@ -53,6 +53,23 @@ export function SiteFooter() {
               <AboutLinks />
             </ul>
           </nav>
+          <nav aria-labelledby="foot-rules">
+            <h2 id="foot-rules" className="foot-title">
+              Your data
+            </h2>
+            <ul className="foot-links">
+              <li>
+                <Link to="/privacy" className="nav-link">
+                  Privacy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="nav-link">
+                  Terms
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
         <div className="credits">
           <p>
@@ -68,7 +85,9 @@ export function SiteFooter() {
             </Link>
           </p>
         </div>
-        <p className="small muted">Steady is a prototype and a work in progress.</p>
+        <p className="small muted">
+          Steady is a prototype and a work in progress. It doesn't give medical advice.
+        </p>
       </div>
     </footer>
   );

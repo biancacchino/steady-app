@@ -9,6 +9,9 @@ export const user = pgTable("user", {
   image: text("image"),
   // Steady: set by the server when the user confirms they are 18 or older at sign-up (PRD 5.1).
   ageConfirmedAt: timestamp("age_confirmed_at").notNull(),
+  // Steady: set by the server when the user agrees to the privacy page (PRD 5.1). Null only for
+  // accounts made before consent existed; the API holds their data routes until they agree.
+  privacyConsentAt: timestamp("privacy_consent_at"),
   // Steady: email or portal address for "Message your care team" (PRD 5.7). Set in settings later.
   careTeamLink: text("care_team_link"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -23,6 +23,7 @@ async function signUpWithEntry(name: string) {
     email,
     password: PASSWORD,
     ageConfirmedAt: new Date(),
+    privacyConsentAt: new Date(),
     inviteCode: env.INVITE_CODE,
   };
   const res = await auth.api.signUpEmail({ body, asResponse: true });

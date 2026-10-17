@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Radio, RadioGroup } from "react-aria-components";
 
 import { FormError } from "@/components/fields";
-import { getSession } from "@/lib/auth-client";
+import { requireConsent } from "@/lib/auth-client";
 import { longDate } from "@/lib/dates";
 
 type Question = { id: string; text: string; options: { label: string }[] };
@@ -18,7 +18,7 @@ type Outcome = "below" | "at_or_above";
 export const Route = createFileRoute("/screening")({
   head: () => ({ meta: [{ title: "A few questions - Steady" }] }),
   beforeLoad: async () => {
-    if (!(await getSession())) throw redirect({ to: "/sign-in" });
+    await requireConsent();
   },
   loader: async () => {
     const res = await fetch("/api/screening");

@@ -4,8 +4,15 @@ import { checkSignIn, checkSignUp } from "./validate";
 
 describe("checkSignUp", () => {
   it("reports every missing field at once, in form order", () => {
-    const e = checkSignUp({ inviteCode: " ", name: "", email: "", password: "", adult: false });
-    expect(Object.keys(e)).toEqual(["inviteCode", "name", "email", "password", "adult"]);
+    const e = checkSignUp({
+      inviteCode: " ",
+      name: "",
+      email: "",
+      password: "",
+      adult: false,
+      consent: false,
+    });
+    expect(Object.keys(e)).toEqual(["inviteCode", "name", "email", "password", "adult", "consent"]);
     expect(e.inviteCode).toBe("Enter your invite code.");
   });
 
@@ -16,6 +23,7 @@ describe("checkSignUp", () => {
       email: "maya@example.com",
       password: "12345678",
       adult: true,
+      consent: true,
     });
     expect(e).toEqual({});
   });
@@ -27,6 +35,7 @@ describe("checkSignUp", () => {
       email: "maya@",
       password: "short",
       adult: true,
+      consent: true,
     });
     expect(e).toEqual({
       email: "Enter an email like name@example.com.",
@@ -42,6 +51,7 @@ describe("checkSignUp name length", () => {
       email: "maya@example.com",
       password: "12345678",
       adult: true,
+      consent: true,
     };
     expect(checkSignUp({ ...base, name: "N".repeat(100) })).toEqual({});
     expect(checkSignUp({ ...base, name: "N".repeat(101) }).name).toBe(

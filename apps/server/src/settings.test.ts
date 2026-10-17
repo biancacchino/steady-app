@@ -22,6 +22,7 @@ async function newUser(name = "Maya") {
     email,
     password: "Password123!",
     ageConfirmedAt: new Date(),
+    privacyConsentAt: new Date(),
     inviteCode: env.INVITE_CODE,
   };
   const res = await auth.api.signUpEmail({ body, asResponse: true });

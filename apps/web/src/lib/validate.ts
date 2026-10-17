@@ -5,6 +5,11 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type Errors = Record<string, string>;
 
+// The privacy consent box on sign-up and on /consent. The server sets the time (packages/auth).
+export const CONSENT_LABEL =
+  "I agree to Steady storing my journal, summaries, and screener answers as the privacy page describes";
+export const CONSENT_MISSING = "Agree to how Steady stores your data to continue.";
+
 export function checkSignIn(v: { email: string; password: string }): Errors {
   const e: Errors = {};
   if (!v.email.trim()) e.email = "Enter your email.";
@@ -19,6 +24,7 @@ export function checkSignUp(v: {
   email: string;
   password: string;
   adult: boolean;
+  consent: boolean;
 }): Errors {
   const e: Errors = {};
   if (!v.inviteCode.trim()) e.inviteCode = "Enter your invite code.";
@@ -28,5 +34,6 @@ export function checkSignUp(v: {
   if (!v.password) e.password = "Enter a password.";
   else if (v.password.length < 8) e.password = "Use at least 8 characters.";
   if (!v.adult) e.adult = "Steady is for adults. Confirm that you are 18 or older to continue.";
+  if (!v.consent) e.consent = CONSENT_MISSING;
   return e;
 }

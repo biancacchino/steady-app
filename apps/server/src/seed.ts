@@ -25,7 +25,12 @@ if (env.NODE_ENV === "production") {
 try {
   // Goes through Better-Auth, so the password is hashed and the 18+ hook runs like a real sign-up.
   // Sign-up is invite only, so the seed sends the code like anyone else (no bypass).
-  const body = { ...DEMO, ageConfirmedAt: new Date(), inviteCode: env.INVITE_CODE };
+  const body = {
+    ...DEMO,
+    ageConfirmedAt: new Date(),
+    privacyConsentAt: new Date(),
+    inviteCode: env.INVITE_CODE,
+  };
   await auth.api.signUpEmail({ body });
   console.log("Created the demo account.");
 } catch (e) {

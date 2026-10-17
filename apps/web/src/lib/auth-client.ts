@@ -1,3 +1,4 @@
+import { redirect } from "@tanstack/react-router";
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
@@ -12,6 +13,7 @@ export const authClient = createAuthClient({
     inferAdditionalFields({
       user: {
         ageConfirmedAt: { type: "date", required: true },
+        privacyConsentAt: { type: "date", required: false },
         careTeamLink: { type: "string", required: false, input: false },
       },
     }),
@@ -21,4 +23,15 @@ export const authClient = createAuthClient({
 export async function getSession() {
   const { data } = await authClient.getSession();
   return data;
+}
+
+/**
+ * For pages that show or store health data. Sends a signed-out visitor to sign in, and an account
+ * made before the consent box existed to /consent. The API refuses those accounts too (app.ts).
+ */
+export async function requireConsent() {
+  const session = await getSession();
+  if (!session) throw redirect({ to: "/sign-in" });
+  if (!session.user.privacyConsentAt) throw redirect({ to: "/consent" });
+  return session;
 }

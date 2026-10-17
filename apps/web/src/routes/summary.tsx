@@ -10,7 +10,7 @@ import { Button, Input, Label, TextField } from "react-aria-components";
 
 import type { CardEntry } from "@/components/entry-card";
 import { EntryFields } from "@/components/entry-fields";
-import { getSession } from "@/lib/auth-client";
+import { requireConsent } from "@/lib/auth-client";
 import { entryTime, formatDate, groupByDay, todayIn } from "@/lib/week";
 
 type Preview = {
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/summary")({
     ...(typeof search.to === "string" ? { to: search.to } : {}),
   }),
   beforeLoad: async () => {
-    if (!(await getSession())) throw redirect({ to: "/sign-in" });
+    await requireConsent();
   },
   loaderDeps: ({ search }) => search,
   loader: async ({ deps }) => {

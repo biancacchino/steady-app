@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "react-aria-components";
 
 import { FormError } from "@/components/fields";
-import { getSession } from "@/lib/auth-client";
+import { requireConsent } from "@/lib/auth-client";
 import { longDate } from "@/lib/dates";
 
 type Step = { title: string; summary: string; from: string | null; to: string | null };
@@ -22,7 +22,7 @@ type Loaded = { kind: "plan"; diet: Diet } | { kind: "locked"; status: string };
 export const Route = createFileRoute("/diet")({
   head: () => ({ meta: [{ title: "Diet plan - Steady" }] }),
   beforeLoad: async () => {
-    if (!(await getSession())) throw redirect({ to: "/sign-in" });
+    await requireConsent();
   },
   loader: async (): Promise<Loaded> => {
     const res = await fetch("/api/diet");
