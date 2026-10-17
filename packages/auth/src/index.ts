@@ -9,6 +9,8 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 const MAX_NAME_LENGTH = 100;
 // Must match apps/web/src/routes/account.tsx.
 const DELETE_PHRASE = "delete my account";
+// apps/server/src/app.ts sends it too, when an older account hasn't agreed yet.
+export const CONSENT_REQUIRED = "Agree to how Steady stores your data to continue.";
 
 // Hashing first gives both sides the same length, so the comparison takes the same time whatever
 // was typed and leaks nothing about the code.
@@ -31,6 +33,9 @@ export const auth = betterAuth({
       // The browser sends a date only when the 18+ box is ticked.
       // The hooks below set the server's own time and keep it from being changed later.
       ageConfirmedAt: { type: "date", required: true, input: true },
+      // Same idea for the privacy consent box. Not required here, so accounts made before it
+      // existed still load; the create hook requires it for every new account.
+      privacyConsentAt: { type: "date", required: false, input: true },
       careTeamLink: { type: "string", required: false, input: false },
     },
     // Deleting the user row cascades to sessions, accounts, and journal entries in one statement
@@ -72,23 +77,33 @@ export const auth = betterAuth({
           if (!user.ageConfirmedAt) {
             throw new APIError("BAD_REQUEST", { message: "Confirm that you are 18 or older." });
           }
+          if (!user.privacyConsentAt) {
+            throw new APIError("BAD_REQUEST", { message: CONSENT_REQUIRED });
+          }
           const name = user.name.trim();
           if (!name || name.length > MAX_NAME_LENGTH) {
             throw new APIError("BAD_REQUEST", {
               message: `Use a name between 1 and ${MAX_NAME_LENGTH} characters.`,
             });
           }
-          return { data: { ...user, name, ageConfirmedAt: new Date() } };
+          const now = new Date();
+          return { data: { ...user, name, ageConfirmedAt: now, privacyConsentAt: now } };
         },
       },
       update: {
-        // The confirmation time records when the user confirmed, so it never changes after sign-up.
+        // The confirmation times record when the user confirmed, so they never change after sign-up.
+        // An older account agrees through POST /api/consent, which sets the time on the server.
         // Refuse instead of dropping the field: Better-Auth merges a hook's data over the original
         // update (with-hooks.mjs), so leaving the field out of the returned data does not remove it.
         before: async (data) => {
           if ("ageConfirmedAt" in data) {
             throw new APIError("BAD_REQUEST", {
               message: "The age confirmation cannot be changed.",
+            });
+          }
+          if ("privacyConsentAt" in data) {
+            throw new APIError("BAD_REQUEST", {
+              message: "The privacy consent cannot be changed.",
             });
           }
         },

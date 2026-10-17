@@ -1,7 +1,7 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-import { getSession } from "@/lib/auth-client";
+import { requireConsent } from "@/lib/auth-client";
 
 type Referral = {
   resources: { name: string; description: string }[];
@@ -12,7 +12,7 @@ type Referral = {
 export const Route = createFileRoute("/referral")({
   head: () => ({ meta: [{ title: "Who can help - Steady" }] }),
   beforeLoad: async () => {
-    if (!(await getSession())) throw redirect({ to: "/sign-in" });
+    await requireConsent();
   },
   component: ReferralPage,
 });

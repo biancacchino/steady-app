@@ -15,6 +15,7 @@ beforeAll(async () => {
     name: "Summary Test",
     email: `${userId}@example.com`,
     ageConfirmedAt: new Date(),
+    privacyConsentAt: new Date(),
   });
 });
 

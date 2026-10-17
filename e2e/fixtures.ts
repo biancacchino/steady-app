@@ -71,6 +71,7 @@ export async function signUp(page: Page) {
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
   await page.getByText("I am 18 or older").click();
+  await page.getByText("I agree to Steady storing").click();
   await page.getByRole("button", { name: "Create account" }).click();
   // Sign-up hashes the password, commits three rows, and loads the journal. On a shared CI
   // runner (two browsers, the server, and Postgres on one machine) that passed the default 5

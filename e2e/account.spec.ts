@@ -50,6 +50,7 @@ test("deleting the account removes it and its journal, and frees the email", asy
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
   await page.getByText("I am 18 or older").click();
+  await page.getByText("I agree to Steady storing").click();
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page).toHaveURL(/\/journal$/);
   const range = new URLSearchParams({ from: "2026-10-12", to: "2026-10-18" });

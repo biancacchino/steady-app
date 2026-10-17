@@ -4,7 +4,7 @@ import { Button, Form } from "react-aria-components";
 
 import { CheckField, Field, FormError, focusFirstError } from "@/components/fields";
 import { authClient, getSession } from "@/lib/auth-client";
-import { checkSignUp, type Errors } from "@/lib/validate";
+import { CONSENT_LABEL, checkSignUp, type Errors } from "@/lib/validate";
 
 export const Route = createFileRoute("/sign-up")({
   head: () => ({ meta: [{ title: "Create an account - Steady" }] }),
@@ -21,6 +21,7 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [adult, setAdult] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [error, setError] = useState<string | null>(null);
   const edit = (field: string, set: (v: string) => void) => (v: string) => {
@@ -32,7 +33,7 @@ function SignUp() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    const found = checkSignUp({ inviteCode, name, email, password, adult });
+    const found = checkSignUp({ inviteCode, name, email, password, adult, consent });
     setErrors(found);
     if (Object.keys(found).length) return focusFirstError(e.currentTarget, found);
     setPending(true);
@@ -43,6 +44,7 @@ function SignUp() {
       email,
       password,
       ageConfirmedAt: new Date(),
+      privacyConsentAt: new Date(),
       inviteCode: inviteCode.trim(),
     };
     const { error } = await authClient.signUp.email(body);
@@ -118,6 +120,29 @@ function SignUp() {
             error={errors.adult}
           >
             I am 18 or older
+          </CheckField>
+          {/* New tab, so reading the pages doesn't clear the form. */}
+          <p className="small">
+            Read the{" "}
+            <Link to="/privacy" target="_blank">
+              privacy page
+            </Link>{" "}
+            and{" "}
+            <Link to="/terms" target="_blank">
+              terms
+            </Link>{" "}
+            (open in a new tab).
+          </p>
+          <CheckField
+            name="consent"
+            isSelected={consent}
+            onChange={(v) => {
+              setConsent(v);
+              if (v) setErrors(({ consent: _, ...rest }) => rest);
+            }}
+            error={errors.consent}
+          >
+            {CONSENT_LABEL}
           </CheckField>
           <Button type="submit" className="btn btn-primary" isDisabled={pending}>
             {pending ? "Creating account" : "Create account"}

@@ -11,13 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as ConsentRouteImport } from './routes/consent'
 import { Route as DietRouteImport } from './routes/diet'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReferralRouteImport } from './routes/referral'
 import { Route as ScreeningRouteImport } from './routes/screening'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SummaryRouteImport } from './routes/summary'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AboutHealthcareRouteImport } from './routes/about.healthcare'
 import { Route as AboutSoftwareRouteImport } from './routes/about.software'
 
@@ -31,6 +34,11 @@ const AccountRoute = AccountRouteImport.update({
   path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsentRoute = ConsentRouteImport.update({
+  id: '/consent',
+  path: '/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DietRoute = DietRouteImport.update({
   id: '/diet',
   path: '/diet',
@@ -39,6 +47,11 @@ const DietRoute = DietRouteImport.update({
 const JournalRoute = JournalRouteImport.update({
   id: '/journal',
   path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReferralRoute = ReferralRouteImport.update({
@@ -66,6 +79,11 @@ const SummaryRoute = SummaryRouteImport.update({
   path: '/summary',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutHealthcareRoute = AboutHealthcareRouteImport.update({
   id: '/about/healthcare',
   path: '/about/healthcare',
@@ -80,26 +98,32 @@ const AboutSoftwareRoute = AboutSoftwareRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/consent': typeof ConsentRoute
   '/diet': typeof DietRoute
   '/journal': typeof JournalRoute
+  '/privacy': typeof PrivacyRoute
   '/referral': typeof ReferralRoute
   '/screening': typeof ScreeningRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/terms': typeof TermsRoute
   '/about/healthcare': typeof AboutHealthcareRoute
   '/about/software': typeof AboutSoftwareRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/consent': typeof ConsentRoute
   '/diet': typeof DietRoute
   '/journal': typeof JournalRoute
+  '/privacy': typeof PrivacyRoute
   '/referral': typeof ReferralRoute
   '/screening': typeof ScreeningRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/terms': typeof TermsRoute
   '/about/healthcare': typeof AboutHealthcareRoute
   '/about/software': typeof AboutSoftwareRoute
 }
@@ -107,13 +131,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/consent': typeof ConsentRoute
   '/diet': typeof DietRoute
   '/journal': typeof JournalRoute
+  '/privacy': typeof PrivacyRoute
   '/referral': typeof ReferralRoute
   '/screening': typeof ScreeningRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/summary': typeof SummaryRoute
+  '/terms': typeof TermsRoute
   '/about/healthcare': typeof AboutHealthcareRoute
   '/about/software': typeof AboutSoftwareRoute
 }
@@ -122,39 +149,48 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/consent'
     | '/diet'
     | '/journal'
+    | '/privacy'
     | '/referral'
     | '/screening'
     | '/sign-in'
     | '/sign-up'
     | '/summary'
+    | '/terms'
     | '/about/healthcare'
     | '/about/software'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
+    | '/consent'
     | '/diet'
     | '/journal'
+    | '/privacy'
     | '/referral'
     | '/screening'
     | '/sign-in'
     | '/sign-up'
     | '/summary'
+    | '/terms'
     | '/about/healthcare'
     | '/about/software'
   id:
     | '__root__'
     | '/'
     | '/account'
+    | '/consent'
     | '/diet'
     | '/journal'
+    | '/privacy'
     | '/referral'
     | '/screening'
     | '/sign-in'
     | '/sign-up'
     | '/summary'
+    | '/terms'
     | '/about/healthcare'
     | '/about/software'
   fileRoutesById: FileRoutesById
@@ -162,13 +198,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  ConsentRoute: typeof ConsentRoute
   DietRoute: typeof DietRoute
   JournalRoute: typeof JournalRoute
+  PrivacyRoute: typeof PrivacyRoute
   ReferralRoute: typeof ReferralRoute
   ScreeningRoute: typeof ScreeningRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SummaryRoute: typeof SummaryRoute
+  TermsRoute: typeof TermsRoute
   AboutHealthcareRoute: typeof AboutHealthcareRoute
   AboutSoftwareRoute: typeof AboutSoftwareRoute
 }
@@ -189,6 +228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/consent': {
+      id: '/consent'
+      path: '/consent'
+      fullPath: '/consent'
+      preLoaderRoute: typeof ConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/diet': {
       id: '/diet'
       path: '/diet'
@@ -201,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/journal'
       fullPath: '/journal'
       preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/referral': {
@@ -238,6 +291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about/healthcare': {
       id: '/about/healthcare'
       path: '/about/healthcare'
@@ -258,13 +318,16 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  ConsentRoute: ConsentRoute,
   DietRoute: DietRoute,
   JournalRoute: JournalRoute,
+  PrivacyRoute: PrivacyRoute,
   ReferralRoute: ReferralRoute,
   ScreeningRoute: ScreeningRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SummaryRoute: SummaryRoute,
+  TermsRoute: TermsRoute,
   AboutHealthcareRoute: AboutHealthcareRoute,
   AboutSoftwareRoute: AboutSoftwareRoute,
 }

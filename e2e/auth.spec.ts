@@ -18,6 +18,7 @@ test("an empty sign-up shows every problem at once and focuses the first", async
   await expect(page.getByText("Enter your email.")).toBeVisible();
   await expect(page.getByText("Enter a password.")).toBeVisible();
   await expect(page.getByText("Confirm that you are 18 or older to continue.")).toBeVisible();
+  await expect(page.getByText("Agree to how Steady stores your data to continue.")).toBeVisible();
   await expect(page.getByLabel("Invite code")).toBeFocused();
 
   await page.getByLabel("Your name").fill("Maya");
@@ -35,6 +36,7 @@ test("a wrong invite code is refused with a message that says only that", async 
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
   await page.getByText("I am 18 or older").click();
+  await page.getByText("I agree to Steady storing").click();
   await page.getByRole("button", { name: "Create account" }).click();
 
   await expect(page.getByRole("alert")).toHaveText(
@@ -106,7 +108,11 @@ test("sign in works with the keyboard alone, with a visible focus ring", async (
 }) => {
   const user = newUser();
   const created = await page.request.post("/api/auth/sign-up/email", {
-    data: { ...user, ageConfirmedAt: new Date().toISOString() },
+    data: {
+      ...user,
+      ageConfirmedAt: new Date().toISOString(),
+      privacyConsentAt: new Date().toISOString(),
+    },
     headers: { "x-forwarded-for": ip, origin: baseURL ?? "" },
   });
   expect(created.ok()).toBe(true);
@@ -162,6 +168,7 @@ test.describe("server-side limits", () => {
     const created = await signUp(request, ip, baseURL ?? "", {
       ...user,
       ageConfirmedAt: new Date().toISOString(),
+      privacyConsentAt: new Date().toISOString(),
     });
     expect(created.ok()).toBe(true);
     const before = (await (await request.get("/api/auth/get-session")).json()).user.ageConfirmedAt;
@@ -181,6 +188,7 @@ test.describe("server-side limits", () => {
       ...user,
       password: "1234567",
       ageConfirmedAt: new Date().toISOString(),
+      privacyConsentAt: new Date().toISOString(),
     });
     expect(res.status()).toBe(400);
   });
@@ -191,6 +199,7 @@ test.describe("server-side limits", () => {
       ...user,
       name: "N".repeat(101),
       ageConfirmedAt: new Date().toISOString(),
+      privacyConsentAt: new Date().toISOString(),
     });
     expect(res.status()).toBe(400);
   });
@@ -201,6 +210,7 @@ test.describe("server-side limits", () => {
       ...user,
       name: "N".repeat(100_000),
       ageConfirmedAt: new Date().toISOString(),
+      privacyConsentAt: new Date().toISOString(),
     });
     expect(res.status()).toBe(413);
   });

@@ -28,6 +28,7 @@ function signUp(body: Record<string, unknown>) {
       email,
       password: "Password123!",
       ageConfirmedAt: new Date().toISOString(),
+      privacyConsentAt: new Date().toISOString(),
       ...body,
     }),
   });

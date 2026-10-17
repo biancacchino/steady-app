@@ -10,7 +10,7 @@ import { Button, ToggleButton } from "react-aria-components";
 
 import { type CardEntry, type CardTarget, EntryCard } from "@/components/entry-card";
 import { EntryFields } from "@/components/entry-fields";
-import { getSession } from "@/lib/auth-client";
+import { requireConsent } from "@/lib/auth-client";
 import {
   addDays,
   daySymptom,
@@ -42,8 +42,7 @@ export const Route = createFileRoute("/journal")({
   validateSearch: (search: Record<string, unknown>): { week?: string } =>
     typeof search.week === "string" ? { week: search.week } : {},
   beforeLoad: async () => {
-    const session = await getSession();
-    if (!session) throw redirect({ to: "/sign-in" });
+    const session = await requireConsent();
     return { userId: session.user.id };
   },
   loaderDeps: ({ search }) => ({ week: weekFromSearch(search.week, todayIn()) }),

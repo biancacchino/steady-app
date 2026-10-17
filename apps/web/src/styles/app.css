@@ -195,10 +195,13 @@ a.btn-secondary:hover {
 }
 
 /* Checkbox: the whole row is the target */
+/* The box lines up with the label's first line, so a long label wraps beside it, not around it.
+   The padding keeps a one-line label centered in the 44px target. */
 .check {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-start;
+  padding-block: 10px;
   min-height: 44px;
   cursor: pointer;
   font-size: 15px;
@@ -206,6 +209,7 @@ a.btn-secondary:hover {
 .check .box {
   width: 20px;
   height: 20px;
+  margin-top: 1px;
   flex: none;
   border: 1.5px solid var(--muted);
   border-radius: 4px;

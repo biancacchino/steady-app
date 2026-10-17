@@ -1,7 +1,10 @@
 import { fileURLToPath } from "node:url";
 import { serveStatic } from "@hono/node-server/serve-static";
-import { auth } from "@steady/auth";
+import { auth, CONSENT_REQUIRED } from "@steady/auth";
+import { db } from "@steady/db";
+import { user } from "@steady/db/schema/index";
 import { env } from "@steady/env/server";
+import { and, eq, isNull } from "drizzle-orm";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { secureHeaders } from "hono/secure-headers";
@@ -64,6 +67,17 @@ app.use("/api/*", async (c, next) => {
   return next();
 });
 
+// Accounts made before the consent box existed store nothing until the user agrees (PRD 5.1).
+// They can still read who they are, agree, export, and delete (delete is under /api/auth/).
+const BEFORE_CONSENT = new Set(["/api/me", "/api/consent", "/api/settings/export"]);
+app.use("/api/*", async (c, next) => {
+  if (c.req.path.startsWith("/api/auth/") || BEFORE_CONSENT.has(c.req.path)) return next();
+  if (!c.get("user").privacyConsentAt) {
+    return c.json({ error: CONSENT_REQUIRED, consentRequired: true }, 403);
+  }
+  return next();
+});
+
 // Never print the error itself. A database error's message includes the query's values, which can be
 // journal text, and logs hold method, path, and status only.
 app.onError((err, c) => {
@@ -77,6 +91,15 @@ app.route("/api/screening", screeningApi);
 app.route("/api/diet", dietApi);
 app.route("/api/referral", referralApi);
 app.route("/api/settings", settings);
+
+// Sets the time once, on the server. Agreeing again keeps the first time.
+app.post("/api/consent", async (c) => {
+  await db
+    .update(user)
+    .set({ privacyConsentAt: new Date() })
+    .where(and(eq(user.id, c.get("user").id), isNull(user.privacyConsentAt)));
+  return c.json({ ok: true });
+});
 
 app.get("/api/me", (c) => {
   const { id, email, name } = c.get("user");

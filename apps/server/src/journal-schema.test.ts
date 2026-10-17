@@ -17,6 +17,7 @@ beforeAll(async () => {
     name: "Schema Test",
     email: `${userId}@example.com`,
     ageConfirmedAt: new Date(),
+    privacyConsentAt: new Date(),
   });
 });
 
@@ -122,6 +123,7 @@ describe("journal_entry constraints", () => {
       name: "Cascade Test",
       email: `${otherId}@example.com`,
       ageConfirmedAt: new Date(),
+      privacyConsentAt: new Date(),
     });
     await db.insert(journalEntry).values({ userId: otherId, timeZone, food: "Rice" });
     await db.delete(user).where(eq(user.id, otherId));

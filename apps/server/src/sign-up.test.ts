@@ -14,6 +14,7 @@ const maya = {
   name: "Maya",
   password: "Password123!",
   ageConfirmedAt: new Date(),
+  privacyConsentAt: new Date(),
   inviteCode: env.INVITE_CODE,
 };
 

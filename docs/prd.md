@@ -75,6 +75,13 @@ Each one has an automated check (section 10), because a regression here is a saf
 - The web app and the API share one origin, so the session cookie is first-party (`SameSite=Lax`) and there is no CORS.
 - **[Default]** Users must confirm they are 18 or older at sign-up.
   Eating-disorder screening and referral for minors is a different clinical path, which the MVP does not cover.
+- Users must agree to the privacy page at sign-up (chosen 2026-10-16), because health information needs express consent under PIPEDA's principles.
+  The server sets `privacy_consent_at`, and it can't be changed afterward.
+  Accounts made before that date see a one-time consent screen; until they agree, the API answers 403 on every data route except export, and deletion stays open.
+  To ask everyone again after a change that affects their data, clear the column for all users.
+- `/privacy` and `/terms` are plain-language pages linked from the footer and from sign-up.
+  Every claim on them must stay true of the code; change them in the same PR as any change to what Steady stores.
+  Neither is lawyer-reviewed yet, and both need a review before invites go beyond friends.
 - Email verification and password reset use a transactional email provider.
   Those emails never contain health data, only account links.
   Both are deferred until deploy, when the provider is chosen.
@@ -286,7 +293,7 @@ Deleting the account deletes every row above for that user in one transaction.
 
 - TLS everywhere, with HSTS.
 - Postgres is encrypted at rest by the host.
-  **[Needs decision]** Pick a host that encrypts at rest and lets you choose the data region.
+  Host and region (chosen 2026-10-15): Render and Neon, both in Ohio, US. The privacy page tells users the data is stored in the US.
 - No analytics of any kind in the MVP, first-party or third-party.
   This is the simplest way to guarantee that screener data stays out of analytics and that non-negotiable 5 holds.
 - No third-party scripts, and fonts are self-hosted instead of loaded from Google Fonts, so no third party learns who uses a health app.
@@ -300,7 +307,7 @@ Deleting the account deletes every row above for that user in one transaction.
   **[Default]** Database backups roll off within 30 days, and the deletion screen says so.
 - Nothing goes to a third party, including a doctor, without the user's explicit action each time.
 - **[Default]** HIPAA: as a student project with no provider integration, Steady is not a covered entity or business associate, so HIPAA likely does not apply.
-  Steady must not claim to be HIPAA compliant.
+  Steady must not claim to be HIPAA compliant, or to hold any certification.
   Revisit this before any provider integration.
 
 ### Accessibility
